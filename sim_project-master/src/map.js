@@ -2,6 +2,7 @@ class SimMap {
   constructor(nodes, connections) {
     this.nodes = nodes;
     this.entrance = nodes.filter((node) => node.type == "entrance")[0];
+    console.log(this.entrance)
     this.rides = nodes.filter((node) => node.type == "ride");
     this.edges = [];
     for (let connect of connections) {
@@ -10,7 +11,7 @@ class SimMap {
 
     // set the rideIDs
     for (let i = 0; i < this.rides.length; i++) {
-      this.rides[i].setRideName(i + 1);
+      this.rides[i].setRideName(node.type);
     }
 
     // run floyd warshall for setup()
@@ -36,7 +37,7 @@ class SimMap {
 
     // set the rideIDs
     for (let i = 0; i < this.rides.length; i++) {
-      this.rides[i].setRideName(i + 1);
+      this.rides[i].setRideName(node.type);
     }
 
     // run floyd warshall for setup
@@ -253,7 +254,7 @@ class MapNode {
     if (this.type == "entrance") {
       this.fill = "#a50";
       this.img = loadImage(ENTRANCE_IMG_PATH);
-    } else if (this.type == "ride") {
+    } else if (this.type == "ride_a" || this.type =="ride_b") {
       this.fill = "#0ab";
       this.img = loadImage(RIDE_IMG_PATH);
 
@@ -261,10 +262,10 @@ class MapNode {
       // Should we set it as random??
       // To adjust this, will need to edit the below functions respectively
 
-      this.setRideParameters(getRandomCapacity(this.type), getRandomRuntime(this.type), getRandomTurnover(this.type));
+      this.setRideParameters(getRideCapacity(this.type), getRideRuntime(this.type), getRideTurnover(this.type));
 
       // if this is a ride, also set the rideID (for display purposes)
-      // this.rideName = `Ride ${++rideID}`;
+      //this.rideName = `Ride ${}`;
 
       // for rides, let us store how many people are in queue at each second (basically every 30 frames)
       this.queueHist = [0];
@@ -273,12 +274,17 @@ class MapNode {
   }
 
 
-  setRideName(rideID) {
-    this.rideName = `Ride ${rideID}`;
+  setRideName(ride_type) {
+    if (ride_type == "ride_a"){
+      this.rideName = "Ride A"
+    } else if (ride_type == "ride_b") {
+      this.rideName = "Ride B"
+    }
+    ;
   }
 
   getQueueTime() {
-    if (this.type == "ride") {
+    if (this.type == "ride_a" || this.type == "ride_b") {
       return int(ceil(this.queue.size() / this.capacity)) * this.turnover;
     } else return 0;
   }
@@ -301,7 +307,7 @@ class MapNode {
 
   getDisplayInfo() {
     // make sure that this node is actually a ride node
-    if (this.type == 'ride') {
+    if (this.type == 'ride_a' || this.type == "ride_b") {
       let displayInfo = `=== ${this.rideName} ===\nCapacity: ${this.capacity}\nRuntime: ${this.runtime}\nTurnover: ${this.turnover}\nQueue time: ${this.getQueueTime()}`;
       return displayInfo;
     }

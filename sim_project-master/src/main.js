@@ -6,6 +6,7 @@ let nodes = [];
 let connections = [];
 let entrance;
 let rides;
+let ride_types = ["ride_a","ride_b"];
 let agents = [];
 let isRunning = false;
 let showStats = true;
@@ -111,7 +112,7 @@ function draw() {
 
 function mouseClicked() {
    
-  const node = new MapNode("ride", mouseX / WIDTH, mouseY / HEIGHT);
+  const node = new MapNode(getRandomRide(ride_types), mouseX / WIDTH, mouseY / HEIGHT);
   nodes.push(node);
   if (simMap == null) {
     simMap = new SimMap(nodes, connections);
@@ -211,7 +212,7 @@ function exportCSV() {
 
 function drawDisplay() {
   for (let node of nodes) {
-    if (dist(node.x, node.y, mouseX, mouseY) < HOVER_RADIUS && node.type == "ride") {
+    if (dist(node.x, node.y, mouseX, mouseY) < HOVER_RADIUS && (node.type == "ride_a" || node.type =="ride_b")) {
       // draw a rectangle at the top left to display info
       fill(255, 255, 255, 60);
       stroke(0);
@@ -314,30 +315,28 @@ function drawGraph(title, data, x, y, defMax) {
 }
 
 function createMap() {
-  // reset the rideID
-  rideID = 0;
-
+  
   // initialise a basic map (0,0 top left; 1,1 btm right)
   let e = new MapNode("entrance", 0.5, 0.6);
-  let n1 = new MapNode("ride", 0.2, 0.5);
+  let n1 = new MapNode(getRandomRide(ride_types), 0.2, 0.5);
   let n2 = new MapNode("junc", 0.3, 0.5);
-  let n3 = new MapNode("ride", 0.4, 0.5);
-  let n4 = new MapNode("ride", 0.6, 0.5);
+  let n3 = new MapNode(getRandomRide(ride_types), 0.4, 0.5);
+  let n4 = new MapNode(getRandomRide(ride_types), 0.6, 0.5);
   let n5 = new MapNode("junc", 0.7, 0.5);
-  let n6 = new MapNode("ride", 0.8, 0.5);
-  let n7 = new MapNode("ride", 0.3, 0.3);
-  let n8 = new MapNode("ride", 0.5, 0.4);
-  let n9 = new MapNode("ride", 0.7, 0.3);
-  let n10 = new MapNode("ride", 0.4, 0.2);
+  let n6 = new MapNode(getRandomRide(ride_types), 0.8, 0.5);
+  let n7 = new MapNode(getRandomRide(ride_types), 0.3, 0.3);
+  let n8 = new MapNode(getRandomRide(ride_types), 0.5, 0.4);
+  let n9 = new MapNode(getRandomRide(ride_types), 0.7, 0.3);
+  let n10 = new MapNode(getRandomRide(ride_types), 0.4, 0.2);
   let n11 = new MapNode("junc", 0.5, 0.3);
-  let n12 = new MapNode("ride", 0.6, 0.3);
+  let n12 = new MapNode(getRandomRide(ride_types), 0.6, 0.3);
 
   // set the global vars
   // rides = [n1, n3, n4, n6, n7, n8, n9, n10, n12];
   // entrance = e;
 
   // initialise the actual map
-  nodes = [e, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11,n12];
+  nodes = [e, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12];
   connections = [[1, 2], [2, 3], [3, 0], [0, 4], [4, 5], [5, 6], [2, 7], [3, 8], [8, 4], [5, 9], [8, 11], [7, 10], [9, 12], [10, 12], [12, 11], [11, 10]];
   simMap = new SimMap(nodes, connections);
 }
@@ -394,7 +393,7 @@ function addAgents() {
     const typeRNG = Math.random();
     if (typeRNG < TOLERANCE_PROB) {
       // console.log("priority entered");
-      const agent = new Agent(simMap, tolerance = true);
+      const agent = new Agent(simMap, tolerance = true, score = 100);
       agents.push(agent);
 
     }
@@ -403,7 +402,7 @@ function addAgents() {
       // agents.push(agent);
     else {
       // console.log("entered");
-      const agent = new Agent(simMap, tolerance = false);
+      const agent = new Agent(simMap, tolerance = false, score = 100);
       agents.push(agent);
     }
   }

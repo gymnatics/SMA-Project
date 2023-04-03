@@ -5,7 +5,7 @@ const HEIGHT = 600;
 const AGENT_RADIUS = 7;
 const NODE_RADIUS = 10;
 
-const NODE_TYPES = ["junc", "ride", "entrance"];
+const NODE_TYPES = ["junc", "ride_a","ride_b", "entrance"];
 
 // display information parameters
 const DISPLAY_HEIGHT = 175;
@@ -36,7 +36,7 @@ const ARRIVAL_PROB = 0.2;
 const CROWD_TURNAWAY_PROB = 0.9; // have x chance of leaving if the crowds are high
 const CROWD_DEPARTURE_PROB = 0.4; // leaving if the crowds are high (after actually entering)
 const RIDES_FOR_SATISFACTION = 0.8; // ride at least x * the number of rides available
-const MAX_SCORE = 20; // leaving once the agent is satisfied
+const MAX_SCORE = 200; // leaving once the agent is satisfied
 const DEPARTURE_PROB = 0.05; // low chance to leave for whatever other reason
 
 const TOLERANCE_PROB = 0.3; // proportion of all visitors that are tolerant

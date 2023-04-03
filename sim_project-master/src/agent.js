@@ -21,7 +21,7 @@ class Agent {
     this.x = map.entrance.x;
     this.y = map.entrance.y;
     this.tolerance = tolerance;
-    this.score = score
+    this.score = score;
     // curNode refers to current node. Initialize as the starting of the map
     this.curNode = map.entrance;
 
@@ -33,7 +33,7 @@ class Agent {
     // given a ride with distance d and waiting time w, the score of the ride is
     // m1 * d + m2 * w where m1 and m2 are constants describing how important those variables are
     // Could take the score as the amount of points that the agent will gain after riding the ride. Can add/minus bonus points afterwards
-    
+
     // For now, just take into consideration tolerance.
     // we also set another variable that suggests whether the park is too crowded for them to stay
     if (this.tolerance == true) {
@@ -220,7 +220,6 @@ class Agent {
   // putting this here just to keep track of when the agent reaches the end of the queue
   startRiding() {
     this.numRidesTaken++;
-    
     const queueTime = (frameRunning - this.startQueueTime) / FRAME_RATE;
     this.timeQueuing += queueTime;
   }

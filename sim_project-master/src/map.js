@@ -3,16 +3,16 @@ class SimMap {
     this.nodes = nodes;
     this.entrance = nodes.filter((node) => node.type == "entrance")[0];
     console.log(this.entrance)
-    this.rides = nodes.filter((node) => node.type == "ride");
+    this.rides = nodes.filter((node) => (node.type == "ride_a" || node.type == "ride_b"));
     this.edges = [];
     for (let connect of connections) {
       this.connectNode(connect[0], connect[1]);
     }
 
-    // set the rideIDs
-    for (let i = 0; i < this.rides.length; i++) {
-      this.rides[i].setRideName(node.type);
-    }
+    // // set the rideIDs
+    // for (let i = 0; i < this.rides.length; i++) {
+    //   this.rides[i].setRideName(node.type);
+    // }
 
     // run floyd warshall for setup()
     this.floydWarshall();
@@ -21,7 +21,7 @@ class SimMap {
   checkMap() {
     // regenerate entrance and ride lists
     const entrances = nodes.filter((node) => node.type == "entrance");
-    this.rides = nodes.filter((node) => node.type == "ride");
+    this.rides = nodes.filter((node) => (node.type == "ride_a" || node.type =="ride_b"));
 
     // check only 1 entrance
     if (entrances.length != 1) {
@@ -191,26 +191,21 @@ class SimMap {
         break;
       }
     }
-    let minQ = Infinity, maxQ = 0, minD = Infinity, maxD = 0;
+    let minQ = Infinity, maxQ = 0
     for (let i = 0; i < this.nodes.length; i++) {
       // we only want to get ride info (get queue time and distance)
-      if (i != startNodeIndex && this.nodes[i].type == "ride") {
+      if (i != startNodeIndex && (this.nodes[i].type == "ride_a" || this.nodes[i].type == "ride_b" )) {
         const queue = this.nodes[i].getQueueTime();
-        const distance = this.dist[startNodeIndex][i];
         minQ = min(queue, minQ);
         maxQ = max(queue, maxQ);
-        minD = min(distance, minD);
-        maxD = max(distance, maxD);
-        retInfo.push([distance, queue, this.nodes[i]]);
+        retInfo.push([queue, this.nodes[i]]);
       }
     }
     // normalise this info (so that we can score the rides effectively)
     const rangeQ = max(maxQ - minQ, 0.1);
-    const rangeD = max(maxD - minD, 1);
     // console.log(rangeQ + " " + rangeD);
     for (let i = 0; i < retInfo.length; i++) {
-      retInfo[i][0] = 1 - (retInfo[i][0] - minD) / rangeD;
-      retInfo[i][1] = 1 - (retInfo[i][1] - minQ) / rangeQ;
+      retInfo[i][0] = 1 - (retInfo[i][1] - minQ) / rangeQ;
     }
     return retInfo;
   }
@@ -253,10 +248,10 @@ class MapNode {
     this.img = null;
     if (this.type == "entrance") {
       this.fill = "#a50";
-      this.img = loadImage(ENTRANCE_IMG_PATH);
+      // this.img = loadImage(ENTRANCE_IMG_PATH);
     } else if (this.type == "ride_a" || this.type =="ride_b") {
       this.fill = "#0ab";
-      this.img = loadImage(RIDE_IMG_PATH);
+      // this.img = loadImage(RIDE_IMG_PATH);
 
       // if this is a ride, set the value for each ride.
       // Should we set it as random??

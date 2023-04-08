@@ -57,7 +57,7 @@ const AgentStates = {
     nextDestination(){
         // generate next destination randomly
         this.next_ride = rides[Math.floor(Math.random()*rides.length)];
-        let nextRideInfo = this.map.getRideInfoFromNode(this.next_ride);
+        //let nextRideInfo = this.map.getRideInfoFromNode(this.next_ride);
         // check the crowds by checking average wait times
         if (this.agentState != AgentStates.ENTERED && this.next_ride.getQueueTime() > this.limit) {
             this.check_rides = this.check_rides + 1

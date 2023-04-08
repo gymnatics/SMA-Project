@@ -193,7 +193,7 @@ class SimMap {
     }
     let minQ = Infinity, maxQ = 0
     for (let i = 0; i < this.nodes.length; i++) {
-      // we only want to get ride info (get queue time and distance)
+      // we only want to get ride info (get queue time )
       if (i != startNodeIndex && (this.nodes[i].type == "ride_a" || this.nodes[i].type == "ride_b" )) {
         const queue = this.nodes[i].getQueueTime();
         minQ = min(queue, minQ);
@@ -303,7 +303,7 @@ class MapNode {
   getDisplayInfo() {
     // make sure that this node is actually a ride node
     if (this.type == 'ride_a' || this.type == "ride_b") {
-      let displayInfo = `=== ${this.rideName} ===\nCapacity: ${this.capacity}\nRuntime: ${this.runtime}\nTurnover: ${this.turnover}\nQueue time: ${this.getQueueTime()}`;
+      let displayInfo = `=== ${this.rideName},${this.type} ===\nCapacity: ${this.capacity}\nRuntime: ${this.runtime}\nTurnover: ${this.turnover}\nQueue time: ${this.getQueueTime()}`;
       return displayInfo;
     }
   }
@@ -321,11 +321,10 @@ class MapNode {
   // eg. if turnover == runtime => you only can have one set of riders at any one time
   // eg. if turnover < runtime => you can have multiple set of riders at any one time
   // eg. if turnover > runtime => there is a "resting period" between consecutive rides
-  setRideParameters(capacity, runtime, turnover, ride_type) {
+  setRideParameters(capacity, runtime, turnover) {
     this.capacity = capacity;
     this.runtime = runtime;
     this.turnover = turnover;
-    this.ride_type = ride_type
 
     // used to keep track on who is riding and who is queuing.
     this.ridingAgents = [];

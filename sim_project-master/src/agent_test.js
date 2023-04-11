@@ -83,16 +83,37 @@ const AgentStates = {
         this.path.shift();
 
         // start moving towards the next node
-        this.startMoving();
+        // this.startMoving();
+        // CHAT-GPT SUGGESTED
+        if (this.path && this.path.length > 0) {
+          this.startMoving();
+        }
         
   }
 
   startMoving(){
-    //set current node
+    // //set current node
+    // this.curNode = this.path[0];
+    // // set the target coords (to the next node)
+    // this.targetX = this.path[0].x;
+    // this.targetY = this.path[0].y;
+
+    // this.initialX = this.x;
+    // this.initialY = this.y;
+
+    // this.lerpT = 0; // varies from 0 to 1
+    // this.timeRequired = dist(this.x, this.y, this.targetX, this.targetY) / this.moveSpeed;
+
+    // CHAT-GPT SUGGESTED
+    // set current node
     this.curNode = this.path[0];
+    if (!this.curNode) {
+      return;
+    }
+
     // set the target coords (to the next node)
-    this.targetX = this.path[0].x;
-    this.targetY = this.path[0].y;
+    this.targetX = this.curNode.x;
+    this.targetY = this.curNode.y;
 
     this.initialX = this.x;
     this.initialY = this.y;

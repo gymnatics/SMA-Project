@@ -10,7 +10,8 @@ class SimMap {
         }
 
     }
-
+  
+  
     updateRides(){
         for (let ride of this.rides){
             ride.update();
@@ -93,7 +94,7 @@ class MapNode {
             this.img = null;
         }
         else{
-            this.setRideParameters(getRideCapacity(this.type));
+            this.setRideParameters(getRideCapacity(this.type),getRideDuration(this.type));
             // for rides, let us store how many people are in queue at each second (basically every 30 frames)
             this.queueHist = [0];            
         }

@@ -36,7 +36,7 @@ const ARRIVAL_PROB = 0.2;
 const CROWD_TURNAWAY_PROB = 0.9; // have x chance of leaving if the crowds are high
 const CROWD_DEPARTURE_PROB = 0.4; // leaving if the crowds are high (after actually entering)
 const RIDES_FOR_SATISFACTION = 0.8; // ride at least x * the number of rides available
-const MAX_SCORE = 200; // leaving once the agent is satisfied
+const MAX_SATISFACTION = 200; // leaving once the agent is satisfied
 const DEPARTURE_PROB = 0.05; // low chance to leave for whatever other reason
 
 const TOLERANCE_PROB = 0.3; // proportion of all visitors that are tolerant
@@ -80,19 +80,19 @@ function getRandomRide(arr) {
 
 
 // change the stuff below as you see fit
-// returns an even number uniformly from 6 - 12
+
 function getRideCapacity(ride_type) {
   var capacityDict = {
-    "ride_a": 50,
-    "ride_b": 25
+    "ride_a": 10,
+    "ride_b": 5
   }
   
   return ride_type in capacityDict ? capacityDict[ride_type] : 0
   
 }
 
-// returns a number uniformly from 1 to 5
-function getRideRuntime(ride_type) {
+
+function getRideDuration(ride_type) {
   var runtimeDict = {
     "ride_a": 5,
     "ride_b": 3
@@ -101,14 +101,6 @@ function getRideRuntime(ride_type) {
   return ride_type in runtimeDict ? runtimeDict[ride_type] : 0;
 }
 
-// returns a number uniformly from 1 to 5
-function getRideTurnover(ride_type) {
-  var turnoverDict = {
-    "ride_a": 3,
-    "ride_b": 2
-  }
-  return ride_type in turnoverDict ? turnoverDict[ride_type] : 0;
-}
 
 // taken from stackoverflow: https://stackoverflow.com/questions/42919469/efficient-way-to-implement-priority-queue-in-javascript
 // because im too lazy to implement a priority queue in javascript

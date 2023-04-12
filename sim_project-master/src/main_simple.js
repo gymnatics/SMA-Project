@@ -285,12 +285,12 @@ function createMap() {
   
     // initialise a basic map (0,0 top left; 1,1 btm right)
     let e = new MapNode("entrance", 0.5, 0.6);
-    let n1 = new MapNode("ride_a", 0.2, 0.1);
+    let n1 = new MapNode("ride_a", 0.1, 0);
     let n2 = new MapNode("ride_b", 0.3, 0.2);
-    let n3 = new MapNode("ride_a", 0.5, 0.4);
+    let n3 = new MapNode("ride_a", 0.5, 0.5);
     let n4 = new MapNode("ride_b", 0.8, 0.3);
-    
-  
+
+
   
     // set the global vars
     rides = [n1, n2, n3, n4];

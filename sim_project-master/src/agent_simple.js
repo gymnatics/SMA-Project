@@ -34,7 +34,7 @@ class Agent{
         //Differentiating btwn different agents
         if (this.tolerance == true){
             // agents who have high threshold for queuing
-            this.fill = "blue";
+            this.fill = "yellow";
             // Waiting times will be less important to them --> lower weightage
             this.queue_w = 1;
             //PArk must be very crowded for them to leave
@@ -43,7 +43,7 @@ class Agent{
         }
         else {
             // low tolerance agents
-            this.fill = "green";
+            this.fill = "red";
 
             //Care more about waiting times --> higher weightage
             this.queue_w = 3;
@@ -82,14 +82,13 @@ class Agent{
             this.targetNode = this.next_ride;
             this.agentState = AgentStates.MOVING;
         }
-
+        console.log(this.satisfaction);
         this.startMoving();
     }
 
     startMoving(){
         // set next ride as current node
         this.curNode = this.targetNode;
-        console.log(this.curNode)
         //SET TARGET COORDS
         this.targetX = this.curNode.x;
         this.targetY = this.curNode.y;

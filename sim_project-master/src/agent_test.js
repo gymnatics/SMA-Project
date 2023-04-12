@@ -134,6 +134,7 @@ const AgentStates = {
       case AgentStates.ENTERED:
         // pick a random ride to head to
         this.nextDestination();
+        this.check_rides = 0;
         break;
       case AgentStates.MOVING: case AgentStates.EXITING:
         this.lerpT += deltaTime / (1000 * this.timeRequired);

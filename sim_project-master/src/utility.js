@@ -10,7 +10,7 @@ const NODE_TYPES = ["junc", "ride_a","ride_b", "entrance"];
 // display information parameters
 const DISPLAY_HEIGHT = 175;
 const DISPLAY_WIDTH = 150;
-const HOVER_RADIUS = 30;
+const HOVER_RADIUS = 50;
 
 const MAX_RIDE_SAMPLES = 100; // keep up to this amount of queue-data
 const RIDE_SAMPLE_UPDATE_FREQ = 0.1 // update the graph every x seconds
@@ -48,8 +48,8 @@ const MOVE_SPEED = 100; // moves x units per second
 const ICON_WIDTH = 40;
 const ICON_HEIGHT = 40;
 
-const RIDE_IMG_PATH = "res/roller-coaster.png";
-const ENTRANCE_IMG_PATH = "res/gate.jpg";
+const RIDE_IMG_PATH = "images/roller-coaster.png";
+const ENTRANCE_IMG_PATH = "images/gate.jpg";
 
 
 

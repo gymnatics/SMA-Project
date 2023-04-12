@@ -1,7 +1,17 @@
 class SimMap {
     constructor(nodes,connections){
         this.nodes = nodes;
-        this.entrance = nodes.filter((node)=> node.type == "entrance")[0];
+        this.entrance = nodes.find((node) => node.type === "entrance");
+
+        if (!this.entrance) {
+        throw new Error("No entrance found in nodes.");
+        }
+
+        const entrances = nodes.filter((node) => node.type === "entrance");
+
+        if (entrances.length > 1) {
+        throw new Error("More than one entrance found in nodes.");
+        }
         this.rides = nodes.filter((node) => (node.type == "ride_a" || node.type == "ride_b"));
         this.edges = [];
         for (let connect of connections){

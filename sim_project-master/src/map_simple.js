@@ -1,8 +1,12 @@
 class SimMap {
-    constructor(nodes){
+    constructor(nodes,connections){
         this.nodes = nodes;
         this.entrance = nodes.filter((node) => node.type == "entrance");
         this.rides = nodes.filter((node) => (node.type == "ride_a" || node.type == "ride_b"));
+        this.edges = [];
+        for (let connect of connections) {
+            this.connectNode(connect[0], connect[1]);
+        }
 
         //set ride IDs
         for (let i = 0; i < this.rides.length; i++){
@@ -10,6 +14,45 @@ class SimMap {
         }
 
     }
+
+    connectNode(node1, node2) {
+        const n1 = this.nodes[node1];
+        const n2 = this.nodes[node2];
+        n1.connect(n2);
+        n2.connect(n1);
+    
+        const edge = [[n1.x, n1.y], [n2.x, n2.y]];
+        this.edges.push(edge);
+    }
+
+    getPathToNode(startNode, targetNode) {
+        // have to search for the indices, unfortunately
+        let u, v;
+        for (let i = 0; i < this.nodes.length; i++) {
+            console.log("these are the nodes:",this.nodes[i]);
+            console.log("this is node[0]:", this.nodes[0]);
+            console.log(this.nodes[0] == startNode);
+            console.log("this is the start node:", startNode);
+            if (this.nodes[i] == startNode){
+                u =i;
+                console.log("this is index:",i)
+            } 
+            else if (this.nodes[i] == targetNode){
+                v = i;
+            } 
+            console.log(u,v);
+        }
+    
+        if (this.next[u][v] === null) return []; // this should never happen
+    
+        let path = [startNode];
+        while (u != v) {
+          u = this.next[u][v];
+          path.push(this.nodes[u]);
+        }
+        return path;
+    }
+     
   
   
     updateRides(){
@@ -85,6 +128,7 @@ class MapNode {
         // x and y passed in as relative (converted to absolute)
         this.x = x * WIDTH;
         this.y = y * HEIGHT;
+        this.connections = [];
 
         this.setTypePars();
     }
@@ -206,14 +250,9 @@ class MapNode {
         // if there is people in the queue and i am ready to receive riders
         if (!this.queue.isEmpty() && this.current_cap < this.capacity) {
             let agents = [];
-            for (let i = 0; i < (this.capacity-this.current_cap); i++) {
-                const agt = this.queue.pop()[1];
-                this.current_cap = this.current_cap - 1
-                agt.startRiding();
-                agents.push(agt);
-            }
-            this.ridingAgents.push(agents);
-            this.runDurations.push(this.duration);
+            const agt = this.queue.pop()[1];
+            agt.startRiding();
+            agents.push(agt)
         }
     
         // if there are people riding, update my ridecooldowns -- refers to ride durations
@@ -234,6 +273,8 @@ class MapNode {
             this.ridingAgents.splice(0, dones);
         }
     }
-
-
+    connect(other) {
+        this.connections.push([other, dist(this.x, this.y, other.x, other.y)]);
+    }
 }
+

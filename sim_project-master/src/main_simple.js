@@ -298,7 +298,8 @@ function createMap() {
   
     // initialise the actual map
     nodes = [e, n1, n2, n3, n4];
-    simMap = new SimMap(nodes);
+    connections = [[0,1],[0,2],[0,3],[0,4],[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
+    simMap = new SimMap(nodes,connections);
 }
 
 function updateLoop() {

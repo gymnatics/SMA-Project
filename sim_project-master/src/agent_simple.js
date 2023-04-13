@@ -25,6 +25,7 @@ class Agent{
 
         //curNode refers to current node
         this.curNode = map.entrance;
+    
 
 
         this.enteredTime = null;
@@ -58,19 +59,23 @@ class Agent{
 
     nextDestination(){
         //generate choice of next ride randomly
-        this.next_ride = rides[Math.floor(Math.random()*this.map.rides.length)];
+        this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
 
         // check the queue time for the next ride to determine next ride
         // agent state in chilling, will leave when score <= 0
         if (this.agentState == AgentStates.CHILLING && this.next_ride.getQueueTime() > this.limit){
-            this.satisfaction = this.satisfaction - 5
-            this.nextDestination()
-
-            if (this.satisfaction <= 0){
-                this.targetNode = this.map.entrance;
-                this.agentState = AgentStates.EXITING;
-                this.fill = "white";
+            this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
+            
+            while (this.next_ride.getQueueTime() > this.limit){
+                this.satisfaction = this.satisfaction - 5;
+                if (this.satisfaction <= 0){
+                    this.targetNode = this.map.entrance;
+                    this.agentState = AgentStates.EXITING;
+                    this.fill = "white";
+                }
+    
             }
+
         }
 
         if (this.satisfaction >= MAX_SATISFACTION){
@@ -83,24 +88,26 @@ class Agent{
             this.agentState = AgentStates.MOVING;
         }
         console.log(this.satisfaction);
+        console.log("this is curNode:", this.curNode);
+        console.log("this is targetNode:", this.targetNode);
+        this.path = this.map.getPathToNode(this.curNode, this.targetNode);
+        this.path.shift();
         this.startMoving();
     }
 
     startMoving(){
-        // set next ride as current node
-        this.curNode = this.targetNode;
-        //SET TARGET COORDS
-        this.targetX = this.curNode.x;
-        this.targetY = this.curNode.y;
+    // set the current node (to the next node)
+    this.curNode = this.path[0];
 
-        this.initialX = this.x;
-        this.initialY = this.y;
+    // set the target coords (to the next node)
+    this.targetX = this.path[0].x;
+    this.targetY = this.path[0].y;
 
-        // compute distance to target destination
-        this.dist_travelled = dist(this.initialX, this.initialY, this.targetX, this.targetY)
+    this.initialX = this.x;
+    this.initialY = this.y;
 
-        this.lerpT = 0; //varies from 0 to 1
-        this.timeRequired = this.dist_travelled / this.moveSpeed;
+    this.lerpT = 0; // varies from 0 to 1
+    this.timeRequired = dist(this.x, this.y, this.targetX, this.targetY) / this.moveSpeed;
 
     }
 
@@ -121,16 +128,18 @@ class Agent{
             
             case AgentStates.MOVING: case AgentStates.EXITING:
                 this.lerpT += deltaTime / (1000 * this.timeRequired);
-
-                if (this.lerpT >= 1){
+        
+                if (this.lerpT >= 1) {
                     this.x = this.targetX;
                     this.y = this.targetY;
-                    if (this.curNode === this.targetNode){
-                        if(this.agentState == AgentStates.MOVING) this.agentState = AgentStates.REACHED;
-                        else this.agentState = AgentStates.EXITED;
-                    }
-                    else{
-                        this.startMoving();
+                    if (this.curNode === this.targetNode) {
+                    if (this.agentState == AgentStates.MOVING) this.agentState = AgentStates.REACHED;
+                    else this.agentState = AgentStates.EXITED;
+                    } else {
+                    // not yet reached the target node
+                    // drop the front node (we're there already), and start moving again
+                    this.path.shift();
+                    this.startMoving();
                     }
                 }
                 break;

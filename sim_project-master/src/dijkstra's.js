@@ -1,131 +1,91 @@
-class Graph {
-    constructor() {
-      this.nodes = [];
-      this.edges = [];
-      this.shortestPaths = null;
+class Node {
+    constructor(name, x, y) {
+      this.name = name;
+      this.x = x;
+      this.y = y;
+      this.connections = [];
     }
   
-    addNode(node) {
-      this.nodes.push(node);
+    addConnection(node, weight) {
+      this.connections.push([node, weight]);
+      node.connections.push([this, weight]);
+    }
+  }
+  
+  class Graph {
+    constructor(nodes) {
+      this.nodes = nodes;
     }
   
-    addEdge(node1, node2, weight) {
-      this.edges.push([node1, node2, weight]);
-    }
+    dijkstra(startNode, endNode) {
+      const dist = {};
+      const visited = {};
+      const previous = {};
+      const queue = [];
   
-    computeShortestPaths() {
-      const N = this.nodes.length;
-      this.shortestPaths = [];
-      for (let i = 0; i < N; i++) {
-        let row = [];
-        for (let j = 0; j < N; j++) {
-          row.push(Infinity);
+      for (let node of this.nodes) {
+        dist[node.name] = Infinity;
+        visited[node.name] = false;
+        previous[node.name] = null;
+      }
+  
+      dist[startNode.name] = 0;
+      queue.push(startNode);
+  
+      while (queue.length > 0) {
+        let current = null;
+        let minDist = Infinity;
+  
+        for (let node of queue) {
+          if (dist[node.name] < minDist && !visited[node.name]) {
+            current = node;
+            minDist = dist[node.name];
+          }
         }
-        this.shortestPaths.push(row);
-        this.shortestPaths[i][i] = 0;
-      }
-      for (let [u, v, w] of this.edges) {
-        let i = this.nodes.indexOf(u);
-        let j = this.nodes.indexOf(v);
-        this.shortestPaths[i][j] = w;
-      }
-      for (let k = 0; k < N; k++) {
-        for (let i = 0; i < N; i++) {
-          for (let j = 0; j < N; j++) {
-            if (this.shortestPaths[i][j] > this.shortestPaths[i][k] + this.shortestPaths[k][j]) {
-              this.shortestPaths[i][j] = this.shortestPaths[i][k] + this.shortestPaths[k][j];
-            }
+  
+        if (current === endNode) {
+          let path = [];
+          while (current !== null) {
+            path.unshift(current.name);
+            current = previous[current.name];
+          }
+          return path;
+        }
+  
+        queue.splice(queue.indexOf(current), 1);
+        visited[current.name] = true;
+  
+        for (let [neighbor, weight] of current.connections) {
+          let alt = dist[current.name] + weight;
+          if (alt < dist[neighbor.name]) {
+            dist[neighbor.name] = alt;
+            previous[neighbor.name] = current;
+            queue.push(neighbor);
           }
         }
       }
-    }
   
-    findShortestPath(node1, node2) {
-      if (!this.shortestPaths) {
-        this.computeShortestPaths();
-      }
-      let i = this.nodes.indexOf(node1);
-      let j = this.nodes.indexOf(node2);
-      let path = [];
-      if (this.shortestPaths[i][j] === Infinity) {
-        return null;
-      }
-      while (i !== j) {
-        let k = this.next[i][j];
-        path.push(this.nodes[k]);
-        i = k;
-      }
-      return path;
-    }
-}
-
-class Agent {
-    constructor(startNode, endNode, shortestPath) {
-      this.currentNode = startNode;
-      this.endNode = endNode;
-      this.shortestPath = shortestPath;
-      this.radius = 10;
-      this.color = 'blue';
-      this.isMoving = false;
-      this.speed = 2;
-      this.targetNode = null;
-    }
-  
-    draw(ctx) {
-      ctx.beginPath();
-      ctx.arc(this.currentNode.x, this.currentNode.y, this.radius, 0, 2 * Math.PI);
-      ctx.fillStyle = this.color;
-      ctx.fill();
-    }
-  
-    async move() {
-      if (this.isMoving) {
-        return;
-      }
-  
-      if (this.currentNode === this.endNode) {
-        return;
-      }
-  
-      this.isMoving = true;
-      this.targetNode = this.shortestPath.shift();
-      const dx = this.targetNode.x - this.currentNode.x;
-      const dy = this.targetNode.y - this.currentNode.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      const steps = distance / this.speed;
-      const stepX = dx / steps;
-      const stepY = dy / steps;
-  
-      for (let i = 1; i <= steps; i++) {
-        await new Promise(resolve => setTimeout(resolve, 10));
-        this.currentNode.x += stepX;
-        this.currentNode.y += stepY;
-      }
-  
-      this.currentNode = this.targetNode;
-      this.isMoving = false;
+      return null;
     }
   }
   
-  const canvas = document.getElementById('myCanvas');
-  const ctx = canvas.getContext('2d');
+  // create nodes
+  const node1 = new Node("Node 1", 0.4, 0.5);
+  const node2 = new Node("Node 2", 0.6, 0.8);
+  const node3 = new Node("Node 3", 0.2, 0.7);
+  const node4 = new Node("Node 4", 0.2, 0.4);
   
-  const node1 = { x: 100, y: 100 };
-  const node2 = { x: 200, y: 200 };
-  const node3 = { x: 300, y: 100 };
+  // add connections
+  node1.addConnection(node2, 1);
+  node1.addConnection(node3, 1);
+  node2.addConnection(node3, 1);
+  node3.addConnection(node4, 1)
   
-  const shortestPath = [node1, node2, node3];
+  // create graph
+  const graph = new Graph([node1, node2, node3]);
   
-  const agent = new Agent(node1, node3, shortestPath);
+  // find shortest path
+  const shortestPath = graph.dijkstra(node1, node2);
   
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    agent.draw(ctx);
-    requestAnimationFrame(draw);
-  }
-  
-  draw();
-  
-  
-
+  console.log(shortestPath); // output: ["Node 1", "Node 2"]
   

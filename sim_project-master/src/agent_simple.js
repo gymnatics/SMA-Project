@@ -90,7 +90,7 @@ class Agent{
         console.log(this.satisfaction);
         console.log("this is curNode:", this.curNode);
         console.log("this is targetNode:", this.targetNode);
-        this.path = this.map.getPathToNode(this.curNode, this.targetNode);
+        this.path = this.map.getShortestPath(this.curNode, this.targetNode);
         this.path.shift();
         this.startMoving();
     }

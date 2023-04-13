@@ -10,7 +10,7 @@ const NODE_TYPES = ["junc", "ride_a","ride_b", "entrance"];
 // display information parameters
 const DISPLAY_HEIGHT = 175;
 const DISPLAY_WIDTH = 150;
-const HOVER_RADIUS = 50;
+const HOVER_RADIUS = 300;
 
 const MAX_RIDE_SAMPLES = 100; // keep up to this amount of queue-data
 const RIDE_SAMPLE_UPDATE_FREQ = 0.1 // update the graph every x seconds
@@ -108,67 +108,66 @@ const PQtop = 0;
 const PQparent = i => ((i + 1) >>> 1) - 1;
 const PQleft = i => (i << 1) + 1;
 const PQright = i => (i + 1) << 1;
-
 class PriorityQueue {
-  constructor(comparator = (a, b) => a > b) {
-    this._heap = [];
-    this._comparator = comparator;
-    this.howmany = 0
-  }
-  size() {
-    return this._heap.length;
-  }
-  isEmpty() {
-    return this.size() == 0;
-  }
-  peek() {
-    return this._heap[PQtop];
-  }
-  push(...values) {
-    values.forEach(value => {
-      this._heap.push(value);
-      this._siftUp();
-    });
-    return this.size();
-  }
-  pop() {
-    const poppedValue = this.peek();
-    const bottom = this.size() - 1;
-    if (bottom > PQtop) {
-      this._swap(PQtop, bottom);
+    constructor(comparator = (a, b) => a > b) {
+      this._heap = [];
+      this._comparator = comparator;
+      this.howmany = 0
     }
-    this._heap.pop();
-    this._siftDown();
-    return poppedValue;
-  }
-  replace(value) {
-    const replacedValue = this.peek();
-    this._heap[PQtop] = value;
-    this._siftDown();
-    return replacedValue;
-  }
-  _greater(i, j) {
-    return this._comparator(this._heap[i], this._heap[j]);
-  }
-  _swap(i, j) {
-    [this._heap[i], this._heap[j]] = [this._heap[j], this._heap[i]];
-  }
-  _siftUp() {
-    let node = this.size() - 1;
-    while (node > PQtop && this._greater(node, PQparent(node))) {
-      this._swap(node, PQparent(node));
-      node = PQparent(node);
+    size() {
+      return this._heap.length;
     }
-  }
-  _siftDown() {
-    let node = PQtop;
-    while (
-      (PQleft(node) < this.size() && this._greater(PQleft(node), node)) ||
-      (PQright(node) < this.size() && this._greater(PQright(node), node))
-    ) {
-      let maxChild = (PQright(node) < this.size() && this._greater(PQright(node), PQleft(node))) ? PQright(node) : PQleft(node);
-      this._swap(node, maxChild);
-      node = maxChild;
+    isEmpty() {
+      return this.size() == 0;
     }
-  }
+    peek() {
+      return this._heap[PQtop];
+    }
+    push(...values) {
+      values.forEach(value => {
+        this._heap.push(value);
+        this._siftUp();
+      });
+      return this.size();
+    }
+    pop() {
+      const poppedValue = this.peek();
+      const bottom = this.size() - 1;
+      if (bottom > PQtop) {
+        this._swap(PQtop, bottom);
+      }
+      this._heap.pop();
+      this._siftDown();
+      return poppedValue;
+    }
+    replace(value) {
+      const replacedValue = this.peek();
+      this._heap[PQtop] = value;
+      this._siftDown();
+      return replacedValue;
+    }
+    _smaller(i, j) {
+      return this._comparator(this._heap[j], this._heap[i]);
+    }
+    _swap(i, j) {
+      [this._heap[i], this._heap[j]] = [this._heap[j], this._heap[i]];
+    }
+    _siftUp() {
+      let node = this.size() - 1;
+      while (node > PQtop && this._smaller(node, PQparent(node))) {
+        this._swap(node, PQparent(node));
+        node = PQparent(node);
+      }
+    }
+    _siftDown() {
+      let node = PQtop;
+      while (
+        (PQleft(node) < this.size() && this._smaller(PQleft(node), node)) ||
+        (PQright(node) < this.size() && this._smaller(PQright(node), node))
+      ) {
+        let minChild = (PQright(node) < this.size() && this._smaller(PQright(node), PQleft(node))) ? PQright(node) : PQleft(node);
+        this._swap(node, minChild);
+        node = minChild;
+      }
+    }
 }

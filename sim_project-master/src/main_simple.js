@@ -284,12 +284,23 @@ function drawGraph(title, data, x, y, defMax) {
 function createMap() {
   
     // initialise a basic map (0,0 top left; 1,1 btm right)
-    let e = new MapNode("entrance", 0.5, 0.6);
-    let n1 = new MapNode("ride_a", 0.1, 0);
-    let n2 = new MapNode("ride_b", 0.3, 0.2);
-    let n3 = new MapNode("ride_a", 0.5, 0.5);
-    let n4 = new MapNode("ride_b", 0.8, 0.3);
+    let e = new MapNode("Node 1","entrance", 0.5, 0.6);
+    let n1 = new MapNode("Node 2","ride_a", 0.1, 0);
+    let n2 = new MapNode("Node 3","ride_b", 0.3, 0.2);
+    let n3 = new MapNode("Node 4","ride_a", 0.5, 0.5);
+    let n4 = new MapNode("Node 5","ride_b", 0.8, 0.3);
 
+    // add connections
+    e.addConnection(n1,1);
+    e.addConnection(n2,1);
+    e.addConnection(n3,1);
+    e.addConnection(n4,1);
+    n1.addConnection(n2,1);
+    n1.addConnection(n3,1);
+    n1.addConnection(n4,1);
+    n2.addConnection(n3,1);
+    n2.addConnection(n4,1);
+    n3.addConnection(n4,1);
 
   
     // set the global vars
@@ -297,9 +308,10 @@ function createMap() {
     // entrance = e;
   
     // initialise the actual map
-    nodes = [e, n1, n2, n3, n4];
-    connections = [[0,1],[0,2],[0,3],[0,4],[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
-    simMap = new SimMap(nodes,connections);
+    const nodes = [e, n1, n2, n3, n4];
+   
+    // connections = [[0,1],[0,2],[0,3],[0,4],[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
+    simMap = new SimMap(nodes);
 }
 
 function updateLoop() {

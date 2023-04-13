@@ -1,60 +1,73 @@
 class SimMap {
-    constructor(nodes,connections){
+    constructor(nodes){
         this.nodes = nodes;
-        this.entrance = nodes.filter((node) => node.type == "entrance");
+        this.dist = {};
+        this.parent = {};
+        this.entrance = nodes.filter((node) => node.type == "entrance")[0];
         this.rides = nodes.filter((node) => (node.type == "ride_a" || node.type == "ride_b"));
         this.edges = [];
-        for (let connect of connections) {
-            this.connectNode(connect[0], connect[1]);
-        }
 
         //set ride IDs
         for (let i = 0; i < this.rides.length; i++){
             this.rides[i].setRideName(i+1);
         }
+        // run dijkstra's for setup
+        //this.dijkstra(this.entrance);
 
     }
-
-    connectNode(node1, node2) {
-        const n1 = this.nodes[node1];
-        const n2 = this.nodes[node2];
-        n1.connect(n2);
-        n2.connect(n1);
+    initialize_single_source(startNode){
     
-        const edge = [[n1.x, n1.y], [n2.x, n2.y]];
-        this.edges.push(edge);
-    }
-
-    getPathToNode(startNode, targetNode) {
-        // have to search for the indices, unfortunately
-        let u, v;
-        for (let i = 0; i < this.nodes.length; i++) {
-            console.log("these are the nodes:",this.nodes[i]);
-            console.log("this is node[0]:", this.nodes[0]);
-            console.log(this.nodes[0] == startNode);
-            console.log("this is the start node:", startNode);
-            if (this.nodes[i] == startNode){
-                u =i;
-                console.log("this is index:",i)
-            } 
-            else if (this.nodes[i] == targetNode){
-                v = i;
-            } 
-            console.log(u,v);
+        for (let node of this.nodes) {
+          this.dist[node.name] = Infinity;
+          this.parent[node.name] = null;
         }
     
-        if (this.next[u][v] === null) return []; // this should never happen
+        this.dist[startNode.name] = 0;
+    }
+
+    relax(u,v,w){
+        if (this.dist[u.name]+ w < this.dist[v.name]){
+            this.dist[v.name] = this.dist[u.name] + w;
+            this.parent[v.name] = u;
+        }
+    }
+    dijkstra(startNode) {
+        console.log("startNode:", startNode);
+        this.initialize_single_source(startNode)
+        const S = new Set();
+        const Q = new PriorityQueue((a, b) => this.dist[a.name] < this.dist[b.name]);
+        console.log("startNode connections:", startNode.connections);
+
+        Q.push(startNode);
+        while (!Q.isEmpty()){
+           let u = Q.pop();
+           S.add(u);
+           console.log("u connections:",u.connections)
+           for (let [v,weight] of u.connections){
+               this.relax(u,v,weight);
+               if (!S.has(v)){
+                Q.push(v);
+               }
+           }
+        }
+    }
+
+    getShortestPath(startNode, endNode) {
+        this.dijkstra(startNode);
+        const parent = this.parent;
+        const path = [endNode];
+        let current = endNode;
     
-        let path = [startNode];
-        while (u != v) {
-          u = this.next[u][v];
-          path.push(this.nodes[u]);
+        while (current !== startNode) {
+          if (!parent[current.name]) {
+            return null; // no path exists
+          }
+          path.unshift(parent[current.name]);
+          current = parent[current.name];
         }
         return path;
     }
-     
-  
-  
+
     updateRides(){
         for (let ride of this.rides){
             ride.update();
@@ -121,16 +134,23 @@ class SimMap {
 }
 
 class MapNode {
-    constructor(type,x,y){
+    constructor(name,type,x,y){
         // 3 types (entrance, ride_a, ride_b)
         this.type = type;
-        
+        this.name = name;
         // x and y passed in as relative (converted to absolute)
         this.x = x * WIDTH;
         this.y = y * HEIGHT;
-        this.connections = [];
+        this.connections = new Map();
+        console.log("this:",this)
 
         this.setTypePars();
+    }
+
+    addConnection(node,weight){
+
+        this.connections.set(node,weight);
+        node.connections.set(node,weight);
     }
 
     setTypePars(){
@@ -272,9 +292,6 @@ class MapNode {
             this.runDurations.splice(0, dones);
             this.ridingAgents.splice(0, dones);
         }
-    }
-    connect(other) {
-        this.connections.push([other, dist(this.x, this.y, other.x, other.y)]);
     }
 }
 

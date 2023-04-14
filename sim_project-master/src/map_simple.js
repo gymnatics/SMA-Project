@@ -6,13 +6,22 @@ class SimMap {
         this.entrance = nodes.filter((node) => node.type == "entrance")[0];
         this.rides = nodes.filter((node) => (node.type == "ride_a" || node.type == "ride_b"));
         this.edges = [];
+        this.path = {};
+
 
         //set ride IDs
         for (let i = 0; i < this.rides.length; i++){
             this.rides[i].setRideName(i+1);
         }
         // run dijkstra's for setup
-        //this.dijkstra(this.entrance);
+        for (let i = 0; i < this.nodes.length; i++){
+            for (let j = i+1; j < this.nodes.length; j++){
+                console.log("i,j:", i,j)
+                this.path[this.nodes[i].name] = this.getShortestPath(this.nodes[i],this.nodes[j]);
+            
+            }
+        }
+        console.log("path:", this.path)
 
     }
     initialize_single_source(startNode){
@@ -32,17 +41,16 @@ class SimMap {
         }
     }
     dijkstra(startNode) {
-        console.log("startNode:", startNode);
+        //console.log("startNode:", startNode);
         this.initialize_single_source(startNode)
         const S = new Set();
         const Q = new PriorityQueue((a, b) => this.dist[a.name] < this.dist[b.name]);
-        console.log("startNode connections:", startNode.connections);
+        //console.log("startNode connections:", startNode.connections);
 
         Q.push(startNode);
         while (!Q.isEmpty()){
            let u = Q.pop();
            S.add(u);
-           console.log("u connections:",u.connections)
            for (let [v,weight] of u.connections){
                this.relax(u,v,weight);
                if (!S.has(v)){
@@ -50,6 +58,7 @@ class SimMap {
                }
            }
         }
+        // console.log("parent array:",this.parent)
     }
 
     getShortestPath(startNode, endNode) {
@@ -65,6 +74,7 @@ class SimMap {
           path.unshift(parent[current.name]);
           current = parent[current.name];
         }
+        // console.log("path:",path)
         return path;
     }
 
@@ -142,7 +152,7 @@ class MapNode {
         this.x = x * WIDTH;
         this.y = y * HEIGHT;
         this.connections = new Map();
-        console.log("this:",this)
+        // console.log("this:",this)
 
         this.setTypePars();
     }

@@ -285,22 +285,52 @@ function createMap() {
   
     // initialise a basic map (0,0 top left; 1,1 btm right)
     let e = new MapNode("Node 1","entrance", 0.5, 0.6);
-    let n1 = new MapNode("Node 2","ride_a", 0.1, 0);
+    let n1 = new MapNode("Node 2","ride_a", 0.4, 0);
     let n2 = new MapNode("Node 3","ride_b", 0.3, 0.2);
     let n3 = new MapNode("Node 4","ride_a", 0.5, 0.5);
     let n4 = new MapNode("Node 5","ride_b", 0.8, 0.3);
 
+    const nodes = [e, n1, n2, n3, n4];
+
     // add connections
-    e.addConnection(n1,1);
-    e.addConnection(n2,1);
-    e.addConnection(n3,1);
-    e.addConnection(n4,1);
-    n1.addConnection(n2,1);
-    n1.addConnection(n3,1);
-    n1.addConnection(n4,1);
-    n2.addConnection(n3,1);
-    n2.addConnection(n4,1);
-    n3.addConnection(n4,1);
+    for (let i = 0; i < nodes.length; i++){
+        for (let j = 0; j < nodes.length; j++){
+            if (i == j) {
+                continue;
+            }
+            nodes[i].addConnection(nodes[j],1)
+            console.log(i,j)
+            
+        
+        }
+    }
+    // e.addConnection(n1,1);
+    // e.addConnection(n2,1);
+    // e.addConnection(n3,1);
+    // e.addConnection(n4,1);
+
+    // n1.addConnection(e,1);
+    // n1.addConnection(n2,1);
+    // n1.addConnection(n3,1);
+    // n1.addConnection(n4,1);
+
+    // n2.addConnection(e,1);
+    // n2.addConnection(n1,1);
+    // n2.addConnection(n3,1);
+    // n2.addConnection(n4,1);
+    
+    // n3.addConnection(e,1);
+    // n3.addConnection(n1,1);
+    // n3.addConnection(n2,1);
+    // n3.addConnection(n4,1);
+
+    // n4.addConnection(e,1);
+    // n4.addConnection(n1,1);
+    // n4.addConnection(n2,1);
+    // n4.addConnection(n3,1);
+
+
+    
 
   
     // set the global vars
@@ -308,7 +338,7 @@ function createMap() {
     // entrance = e;
   
     // initialise the actual map
-    const nodes = [e, n1, n2, n3, n4];
+    // const nodes = [e, n1, n2, n3, n4];
    
     // connections = [[0,1],[0,2],[0,3],[0,4],[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
     simMap = new SimMap(nodes);

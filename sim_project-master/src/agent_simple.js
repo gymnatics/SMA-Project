@@ -90,7 +90,7 @@ class Agent{
         console.log(this.satisfaction);
         console.log("this is curNode:", this.curNode);
         console.log("this is targetNode:", this.targetNode);
-        this.path = this.map.getShortestPath(this.curNode, this.targetNode);
+        this.path = this.map.useShortestPath(this.curNode, this.targetNode);
         this.path.shift();
         this.startMoving();
     }
@@ -148,18 +148,19 @@ class Agent{
                 // enqueue this agent into ride (ride will deal with them)
                 if (this.tolerance == true){
                     this.targetNode.enqueue(this,1);
-                    break;
                 }
                 else{
                     this.targetNode.enqueue(this,0);
-                    break;
                 }
+                break;
             
             case AgentStates.FINISHED:
                 this.agentState = AgentStates.CHILLING;
                 break;
 
         }
+
+        console.debug("agent state:", this.agentState)
     }
 
     startQueueing(){

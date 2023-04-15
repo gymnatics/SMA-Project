@@ -6,7 +6,7 @@ class SimMap {
         this.entrance = nodes.filter((node) => node.type == "entrance")[0];
         this.rides = nodes.filter((node) => (node.type == "ride_a" || node.type == "ride_b"));
         this.edges = [];
-        this.path = {};
+        this.shortest_path = {};
 
 
         //set ride IDs
@@ -15,13 +15,18 @@ class SimMap {
         }
         // run dijkstra's for setup
         for (let i = 0; i < this.nodes.length; i++){
-            for (let j = i+1; j < this.nodes.length; j++){
-                console.log("i,j:", i,j)
-                this.path[this.nodes[i].name] = this.getShortestPath(this.nodes[i],this.nodes[j]);
+            this.shortest_path[this.nodes[i].name]= {}
+            // console.log(this.nodes[i])
+            for (let j = 0; j < this.nodes.length; j++){
+                if (i == j) {
+                    continue;
+                }
+                // console.log("i,j:", i,j)
+                this.shortest_path[this.nodes[i].name][this.nodes[j].name] = this.getShortestPath(this.nodes[i],this.nodes[j]);
             
             }
         }
-        console.log("path:", this.path)
+        console.debug("path:", this.shortest_path)
 
     }
     initialize_single_source(startNode){
@@ -76,6 +81,17 @@ class SimMap {
         }
         // console.log("path:",path)
         return path;
+    }
+
+    useShortestPath(startNode,EndNode){
+        const path = [startNode]
+        for (let node of this.shortest_path[startNode.name][EndNode.name]){
+            path.push(node);
+        }
+        console.log(path);
+        
+        return path
+
     }
 
     updateRides(){
@@ -187,7 +203,7 @@ class MapNode {
 
     reset() {
         // reset the queue, cooldowns, riding agents
-        this.queue = new PriorityQueue((a, b) => a[0] > b[0]);
+        this.queue = new MaxPriorityQueue((a, b) => a[0] > b[0]);
         this.ridingAgents = [];
         this.queueHist = [0];
         // this.maxQueueSoFar = 1;
@@ -213,7 +229,7 @@ class MapNode {
 
         // used to keep track on who is riding and who is queuing
         this.ridingAgents = [];
-        this.queue = new PriorityQueue((a,b)=> a[0]>b[0]);
+        this.queue = new MaxPriorityQueue((a,b)=> a[0]>b[0]);
 
         this.runDurations = [];
 
@@ -275,8 +291,7 @@ class MapNode {
                 this.queueHist.shift();
             }
         }
-    
-    
+
         // if there is people in the queue and i am ready to receive riders
         if (!this.queue.isEmpty() && this.current_cap < this.capacity) {
             let agents = [];
@@ -284,6 +299,8 @@ class MapNode {
             agt.startRiding();
             agents.push(agt)
         }
+
+
     
         // if there are people riding, update my ridecooldowns -- refers to ride durations
         if (this.runDurations.length > 0) {

@@ -299,7 +299,7 @@ function createMap() {
                 continue;
             }
             nodes[i].addConnection(nodes[j],1)
-            console.log(i,j)
+            // console.log(i,j)
             
         
         }

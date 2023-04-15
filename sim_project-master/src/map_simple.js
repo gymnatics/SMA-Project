@@ -88,7 +88,7 @@ class SimMap {
         for (let node of this.shortest_path[startNode.name][EndNode.name]){
             path.push(node);
         }
-        console.log(path);
+        // console.log("shortest path:", this.shortest_path[startNode.name][EndNode.name]);
         
         return path
 
@@ -229,6 +229,7 @@ class MapNode {
 
         // used to keep track on who is riding and who is queuing
         this.ridingAgents = [];
+
         this.queue = new MaxPriorityQueue((a,b)=> a[0]>b[0]);
 
         this.runDurations = [];
@@ -298,10 +299,13 @@ class MapNode {
             const agt = this.queue.pop()[1];
             agt.startRiding();
             agents.push(agt)
+
         }
+        this.ridingAgents.push(agents)
+        this.runDurations.push(this.duration);
 
-
-    
+        // console.debug("ridingAgents:", this.ridingAgents)
+        // console.debug("runDurations:", this.runDurations);
         // if there are people riding, update my ridecooldowns -- refers to ride durations
         if (this.runDurations.length > 0) {
             let dones = 0;

@@ -20,7 +20,7 @@ class Agent{
         this.y = map.entrance.y;
 
         this.tolerance = tolerance;
-        this.score = score;
+        
         this.satisfaction = 100;
 
         //curNode refers to current node
@@ -58,15 +58,13 @@ class Agent{
 
 
     nextDestination(){
-        //generate choice of next ride randomly
         this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
-
         // check the queue time for the next ride to determine next ride
         // agent state in chilling, will leave when score <= 0
         if (this.agentState == AgentStates.CHILLING && this.next_ride.getQueueTime() > this.limit){
             this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
             
-            while (this.next_ride.getQueueTime() > this.limit){
+            if (this.next_ride.getQueueTime() > this.limit){
                 this.satisfaction = this.satisfaction - 5;
                 if (this.satisfaction <= 0){
                     this.targetNode = this.map.entrance;
@@ -76,20 +74,21 @@ class Agent{
     
             }
 
-        }
-
-        if (this.satisfaction >= MAX_SATISFACTION){
+        } else if (this.satisfaction >= MAX_SATISFACTION){
             this.targetNode = this.map.entrance;
             this.agentState = AgentStates.EXITING;
             this.fill = "white";
         }
         else{
+            // //generate choice of next ride randomly
+            // this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
             this.targetNode = this.next_ride;
             this.agentState = AgentStates.MOVING;
         }
-        console.log(this.satisfaction);
-        console.log("this is curNode:", this.curNode);
-        console.log("this is targetNode:", this.targetNode);
+        console.debug("target node:", this.targetNode)
+        console.debug(this.satisfaction);
+        // console.log("this is curNode:", this.curNode);
+        // console.log("this is targetNode:", this.targetNode);
         this.path = this.map.useShortestPath(this.curNode, this.targetNode);
         this.path.shift();
         this.startMoving();
@@ -108,7 +107,8 @@ class Agent{
 
     this.lerpT = 0; // varies from 0 to 1
     this.timeRequired = dist(this.x, this.y, this.targetX, this.targetY) / this.moveSpeed;
-
+    console.debug("target X and Y:", this.targetX, this.targetY);
+    console.debug("initial lerpT:", this.lerpT)
     }
 
 
@@ -123,18 +123,19 @@ class Agent{
 
             case AgentStates.CHILLING:
                 //pick a random ride to head to
+                this.satisfaction -= 5;
                 this.nextDestination();
                 break;
             
             case AgentStates.MOVING: case AgentStates.EXITING:
                 this.lerpT += deltaTime / (1000 * this.timeRequired);
-        
+                console.debug(this.lerpT);
                 if (this.lerpT >= 1) {
                     this.x = this.targetX;
                     this.y = this.targetY;
                     if (this.curNode === this.targetNode) {
-                    if (this.agentState == AgentStates.MOVING) this.agentState = AgentStates.REACHED;
-                    else this.agentState = AgentStates.EXITED;
+                        if (this.agentState == AgentStates.MOVING) this.agentState = AgentStates.REACHED;
+                        else this.agentState = AgentStates.EXITED;
                     } else {
                     // not yet reached the target node
                     // drop the front node (we're there already), and start moving again
@@ -160,7 +161,7 @@ class Agent{
 
         }
 
-        console.debug("agent state:", this.agentState)
+        // console.debug("agent state:", this.agentState)
     }
 
     startQueueing(){

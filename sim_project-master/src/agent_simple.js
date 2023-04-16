@@ -139,13 +139,12 @@ class Agent{
                     if (this.curNode === this.targetNode) {
                         if (this.agentState == AgentStates.MOVING) this.agentState = AgentStates.REACHED;
                         else this.agentState = AgentStates.EXITED;
-                    } 
-                    // else {
-                    //     // not yet reached the target node
-                    //     // drop the front node (we're there already), and start moving again
-                    //     this.movepath.shift();
-                    //     this.startMoving();
-                    // }
+                    } else {
+                        // not yet reached the target node
+                        // drop the front node (we're there already), and start moving again
+                        this.movepath.shift();
+                        this.startMoving();
+                    }
                 }
                 break;
             

@@ -318,6 +318,7 @@ class MapNode {
                     dones += 1;
                     for (const agt of this.ridingAgents[i]) {
                         agt.doneRiding();
+                        console.log("done riding")
                     }
                 }
             }

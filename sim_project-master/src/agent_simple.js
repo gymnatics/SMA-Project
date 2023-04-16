@@ -63,6 +63,7 @@ class Agent{
         // agent state in chilling, will leave when score <= 0
         if (this.agentState == AgentStates.CHILLING && this.next_ride.getQueueTime() > this.limit){
             this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
+            console.log(next_ride.getQueueTime())
             
             if (this.next_ride.getQueueTime() > this.limit){
                 this.satisfaction = this.satisfaction - 5;

@@ -32,6 +32,8 @@ let avgQueueTimeHist = [];
 let avgScore = 0;
 let avgScoreHist = [];
 
+let isSpawn = false;
+
 function setup(){
     createCanvas(WIDTH, HEIGHT);
 
@@ -79,7 +81,9 @@ function draw(){
     if (isRunning){
         frameRunning++;
         time += deltaTime /1000;
+        console.log(isSpawn);
         updateLoop();
+        
     }
 
     for (let agent of agents){
@@ -347,7 +351,11 @@ function createMap() {
 }
 
 function updateLoop() {
-    addAgents();
+    if (isSpawn == false){
+        addAgents();
+        isSpawn = true;
+    }
+    
   
     for (let agent of agents) {
         agent.update();
@@ -380,19 +388,45 @@ function updateLoop() {
   
 }
 
+// function addAgents() {
+//     if (Math.random() < ARRIVAL_PROB) {
+  
+//         // increment number of visitors
+//         totalVisitors++;
+  
+//         const typeRNG = Math.random();
+//         if (typeRNG < TOLERANCE_PROB) {
+//             // console.log("priority entered");
+//             const agent = new Agent(simMap, tolerance = true, score = 100);
+//             agents.push(agent);
+  
+//         }
+//         // need to instantiate a new agent, otherwise, it'll just be one agent being updated twice per loop
+//         // possible to identify groupings within the agents? maybe some sort of id
+//         // agents.push(agent);
+//         else {
+//             // console.log("entered");
+//             const agent = new Agent(simMap, tolerance = false, score = 100);
+//             agents.push(agent);
+//         }
+//     }
+// }
+
 function addAgents() {
-    if (Math.random() < ARRIVAL_PROB) {
+    if (1 == 1) {
   
         // increment number of visitors
         totalVisitors++;
   
         const typeRNG = Math.random();
+        // const typeRNG = 1;
         if (typeRNG < TOLERANCE_PROB) {
             // console.log("priority entered");
             const agent = new Agent(simMap, tolerance = true, score = 100);
             agents.push(agent);
   
         }
+        
         // need to instantiate a new agent, otherwise, it'll just be one agent being updated twice per loop
         // possible to identify groupings within the agents? maybe some sort of id
         // agents.push(agent);

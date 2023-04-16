@@ -27,7 +27,7 @@ class SimMap {
             
             }
         }
-        // console.debug("path:", this.shortest_path)
+        console.debug("path:", this.shortest_path)
 
     }
     initialize_single_source(startNode){

@@ -7,7 +7,7 @@ class SimMap {
         this.rides = nodes.filter((node) => (node.type == "ride_a" || node.type == "ride_b"));
         this.edges = [];
         this.shortest_path = {};
-        console.log("rides:",this.rides);
+        // console.log("rides:",this.rides);
 
 
         //set ride IDs
@@ -19,15 +19,15 @@ class SimMap {
             this.shortest_path[this.nodes[i].name]= {}
             // console.log(this.nodes[i])
             for (let j = 0; j < this.nodes.length; j++){
-                if (i == j) {
-                    continue;
-                }
+                // if (i == j) {
+                //     continue;
+                // }
                 // console.log("i,j:", i,j)
                 this.shortest_path[this.nodes[i].name][this.nodes[j].name] = this.getShortestPath(this.nodes[i],this.nodes[j]);
             
             }
         }
-        console.debug("path:", this.shortest_path)
+        // console.debug("path:", this.shortest_path)
 
     }
     initialize_single_source(startNode){
@@ -124,33 +124,33 @@ class SimMap {
         }
     }
 
-    getRideInfoFromNode(startNode) {
-        let retInfo = [];
-        let startNodeIndex;
-        for (let i = 0; i < this.nodes.length; i++) {
-            if (this.nodes[i] === startNode) {
-                startNodeIndex = i;
-                break;
-            }
-        }
-        let minQ = Infinity, maxQ = 0
-        for (let i = 0; i < this.nodes.length; i++) {
-            // we only want to get ride info (get queue time )
-            if (i != startNodeIndex && (this.nodes[i].type == "ride_a" || this.nodes[i].type == "ride_b" )) {
-                const queue = this.nodes[i].getQueueTime();
-                minQ = min(queue, minQ);
-                maxQ = max(queue, maxQ);
-                retInfo.push([queue, this.nodes[i]]);
-            }
-        }
-        // normalise this info (so that we can score the rides effectively)
-        const rangeQ = max(maxQ - minQ, 0.1);
-        // console.log(rangeQ + " " + rangeD);
-        for (let i = 0; i < retInfo.length; i++) {
-            retInfo[i][0] = 1 - (retInfo[i][1] - minQ) / rangeQ;
-        }
-        return retInfo;
-    }
+    // getRideInfoFromNode(startNode) {
+    //     let retInfo = [];
+    //     let startNodeIndex;
+    //     for (let i = 0; i < this.nodes.length; i++) {
+    //         if (this.nodes[i] === startNode) {
+    //             startNodeIndex = i;
+    //             break;
+    //         }
+    //     }
+    //     let minQ = Infinity, maxQ = 0
+    //     for (let i = 0; i < this.nodes.length; i++) {
+    //         // we only want to get ride info (get queue time )
+    //         if (i != startNodeIndex && (this.nodes[i].type == "ride_a" || this.nodes[i].type == "ride_b" )) {
+    //             const queue = this.nodes[i].getQueueTime();
+    //             minQ = min(queue, minQ);
+    //             maxQ = max(queue, maxQ);
+    //             retInfo.push([queue, this.nodes[i]]);
+    //         }
+    //     }
+    //     // normalise this info (so that we can score the rides effectively)
+    //     const rangeQ = max(maxQ - minQ, 0.1);
+    //     // console.log(rangeQ + " " + rangeD);
+    //     for (let i = 0; i < retInfo.length; i++) {
+    //         retInfo[i][0] = 1 - (retInfo[i][1] - minQ) / rangeQ;
+    //     }
+    //     return retInfo;
+    // }
 
     getAverageQueueTime() {
         let totalQueueTimes = 0;
@@ -200,7 +200,7 @@ class MapNode {
     getQueueTime() {
         if (this.type == "ride_a" || this.type == "ride_b") {
             return int(ceil(this.queue.size() / this.capacity));
-        } else return 0;
+        } else return "Not a ride:",0;
     }
 
     reset() {

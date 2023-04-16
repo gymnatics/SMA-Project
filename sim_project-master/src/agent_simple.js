@@ -50,7 +50,7 @@ class Agent{
             this.queue_w = 3;
 
             // not so good with crowds
-            this.limit = 15;
+            this.limit = 10;
         }
         // Generate move speed of agents
         this.moveSpeed = MOVE_SPEED + (Math.random()*40-20);
@@ -59,23 +59,21 @@ class Agent{
 
     nextDestination(){
         this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
+        console.debug("rides:", this.map.rides);
+        console.debug(this.satisfaction);
         // check the queue time for the next ride to determine next ride
         // agent state in chilling, will leave when score <= 0
         if (this.agentState == AgentStates.CHILLING && this.next_ride.getQueueTime() > this.limit){
-            this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
-            console.log(next_ride.getQueueTime())
-            
-            if (this.next_ride.getQueueTime() > this.limit){
-                this.satisfaction = this.satisfaction - 5;
-                if (this.satisfaction <= 0){
-                    this.targetNode = this.map.entrance;
-                    this.agentState = AgentStates.EXITING;
-                    this.fill = "white";
-                }
-    
+            // this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
+            // this.satisfaction = this.satisfaction - 5;
+            if (this.satisfaction <= 0){
+                this.targetNode = this.map.entrance;
+                this.agentState = AgentStates.EXITING;
+                this.fill = "white";
             }
 
         } else if (this.satisfaction >= MAX_SATISFACTION){
+            
             this.targetNode = this.map.entrance;
             this.agentState = AgentStates.EXITING;
             this.fill = "white";
@@ -86,9 +84,9 @@ class Agent{
             this.targetNode = this.next_ride;
             this.agentState = AgentStates.MOVING;
         }
-        console.log("this is curNode:", this.curNode);
+        console.debug("this is curNode:", this.curNode);
         console.debug("target node:", this.targetNode);
-        // console.debug(this.satisfaction);
+        
         
         // console.log("this is targetNode:", this.targetNode);
         this.movepath = this.map.useShortestPath(this.curNode, this.targetNode);
@@ -133,19 +131,21 @@ class Agent{
             
             case AgentStates.MOVING: case AgentStates.EXITING:
                 this.lerpT += deltaTime / (1000 * this.timeRequired);
-                // console.debug(this.lerpT);
+                console.debug(this.lerpT);
                 if (this.lerpT >= 1) {
                     this.x = this.targetX;
                     this.y = this.targetY;
+                    // this.timeRequired = dist(this.x, this.y, this.targetX, this.targetY) / this.moveSpeed;
                     if (this.curNode === this.targetNode) {
                         if (this.agentState == AgentStates.MOVING) this.agentState = AgentStates.REACHED;
                         else this.agentState = AgentStates.EXITED;
-                    } else {
-                    // not yet reached the target node
-                    // drop the front node (we're there already), and start moving again
-                    this.movepath.shift();
-                    this.startMoving();
-                    }
+                    } 
+                    // else {
+                    //     // not yet reached the target node
+                    //     // drop the front node (we're there already), and start moving again
+                    //     this.movepath.shift();
+                    //     this.startMoving();
+                    // }
                 }
                 break;
             
@@ -160,6 +160,7 @@ class Agent{
                 break;
             
             case AgentStates.FINISHED:
+                this.satisfaction += 10;
                 this.agentState = AgentStates.CHILLING;
                 break;
 
@@ -177,18 +178,13 @@ class Agent{
         this.numRidesTaken++;
         const queueTime = (frameRunning - this.startQueueTime) / FRAME_RATE;
         this.timeQueueing += queueTime;
-        //normalize queue times into scores
-        let minQ = Infinity, maxQ = 0
-        minQ = min(this.timeQueuing,minQ);
-        maxQ = max(this.timeQueuing,maxQ);
-        const rangeQ = max(maxQ-minQ, 0.1);
-        var queue_score = (this.timeQueuing-minQ)/rangeQ
-        this.satisfaction = this.satisfaction - queue_score * this.queue_w
+        
     }
 
     doneRiding(){
+        this.satisfaction -= this.queue_w;
         this.agentState = AgentStates.FINISHED;
-        this.satisfaction += 20
+        
     }
     draw() {
         stroke(0);

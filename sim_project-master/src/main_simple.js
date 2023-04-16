@@ -228,7 +228,6 @@ function drawStats() {
     statsString = `=== Global Stats ===
     Total visitors (lifetime): ${totalVisitors}
     Current visitors: ${totalVisitors - numExitedAgents}
-    Missed visitors: ${totalAgtsLeft}
     Average time spent (per visitor): ${(totalTimeSpent / exitedVisitors).toFixed(3)}
     Average queue time (per ride): ${(averageQueueTime).toFixed(3)}`;
     
@@ -309,7 +308,10 @@ function createMap() {
     // e.addConnection(n3,1);
     // e.addConnection(n4,1);
 
-    // n1.addConnection(e,1);
+    n1.addConnection(n1,1);
+    n2.addConnection(n2,1);
+    n3.addConnection(n3,1);
+    n4.addConnection(n4,1);
     // n1.addConnection(n2,1);
     // n1.addConnection(n3,1);
     // n1.addConnection(n4,1);
@@ -334,7 +336,7 @@ function createMap() {
 
   
     // set the global vars
-    rides = [n1, n2, n3, n4];
+    //rides = [n1, n2, n3, n4];
     // entrance = e;
   
     // initialise the actual map
@@ -403,14 +405,9 @@ function addAgents() {
 }
 
 function removeAgents() {
-    // we need to keep track of the cummulative total of how many people left
-    let leftAgents = agents.filter((agt) => agt.agentState == AgentStates.LEFT);
-    for (let agent of leftAgents) {
-        totalAgtsLeft += agent.size;
-    }
-  
+
     let exitedAgents = agents.filter((agt) => agt.agentState == AgentStates.EXITED);
-    agents = agents.filter((agt) => (agt.agentState != AgentStates.EXITED && agt.agentState != AgentStates.LEFT));
+    agents = agents.filter((agt) => (agt.agentState != AgentStates.EXITED));
   
     // let times = frameRunning * exitedAgents.length;
     // let ridesTaken = 0;

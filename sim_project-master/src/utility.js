@@ -33,8 +33,8 @@ const GG_WIDTH = 100;
 // simulation parameters
 const ARRIVAL_PROB = 0.2;
 
-const CROWD_TURNAWAY_PROB = 0.9; // have x chance of leaving if the crowds are high
-const CROWD_DEPARTURE_PROB = 0.4; // leaving if the crowds are high (after actually entering)
+// const CROWD_TURNAWAY_PROB = 0.9; // have x chance of leaving if the crowds are high
+// const CROWD_DEPARTURE_PROB = 0.4; // leaving if the crowds are high (after actually entering)
 const RIDES_FOR_SATISFACTION = 0.8; // ride at least x * the number of rides available
 const MAX_SATISFACTION = 200; // leaving once the agent is satisfied
 const DEPARTURE_PROB = 0.05; // low chance to leave for whatever other reason
@@ -172,6 +172,10 @@ class PriorityQueue {
     }
 }
 
+const PQtop1 = 0;
+const PQparent1 = i => ((i + 1) >>> 1) - 1;
+const PQleft1 = i => (i << 1) + 1;
+const PQright1 = i => (i + 1) << 1;
 class MaxPriorityQueue {
   constructor(comparator = (a, b) => a > b) {
     this._heap = [];
@@ -185,7 +189,7 @@ class MaxPriorityQueue {
     return this.size() == 0;
   }
   peek() {
-    return this._heap[PQtop];
+    return this._heap[PQtop1];
   }
   push(...values) {
     values.forEach(value => {
@@ -197,8 +201,8 @@ class MaxPriorityQueue {
   pop() {
     const poppedValue = this.peek();
     const bottom = this.size() - 1;
-    if (bottom > PQtop) {
-      this._swap(PQtop, bottom);
+    if (bottom > PQtop1) {
+      this._swap(PQtop1, bottom);
     }
     this._heap.pop();
     this._siftDown();
@@ -206,7 +210,7 @@ class MaxPriorityQueue {
   }
   replace(value) {
     const replacedValue = this.peek();
-    this._heap[PQtop] = value;
+    this._heap[PQtop1] = value;
     this._siftDown();
     return replacedValue;
   }
@@ -218,18 +222,18 @@ class MaxPriorityQueue {
   }
   _siftUp() {
     let node = this.size() - 1;
-    while (node > PQtop && this._greater(node, PQparent(node))) {
-      this._swap(node, PQparent(node));
-      node = PQparent(node);
+    while (node > PQtop1 && this._greater(node, PQparent1(node))) {
+      this._swap(node, PQparent1(node));
+      node = PQparent1(node);
     }
   }
   _siftDown() {
-    let node = PQtop;
+    let node = PQtop1;
     while (
-      (PQleft(node) < this.size() && this._greater(PQleft(node), node)) ||
-      (PQright(node) < this.size() && this._greater(PQright(node), node))
+      (PQleft1(node) < this.size() && this._greater(PQleft1(node), node)) ||
+      (PQright1(node) < this.size() && this._greater(PQright1(node), node))
     ) {
-      let maxChild = (PQright(node) < this.size() && this._greater(PQright(node), PQleft(node))) ? PQright(node) : PQleft(node);
+      let maxChild = (PQright1(node) < this.size() && this._greater(PQright1(node), PQleft1(node))) ? PQright1(node) : PQleft1(node);
       this._swap(node, maxChild);
       node = maxChild;
     }

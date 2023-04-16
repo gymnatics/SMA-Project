@@ -7,6 +7,7 @@ class SimMap {
         this.rides = nodes.filter((node) => (node.type == "ride_a" || node.type == "ride_b"));
         this.edges = [];
         this.shortest_path = {};
+        console.log("rides:",this.rides);
 
 
         //set ride IDs
@@ -88,6 +89,7 @@ class SimMap {
         for (let node of this.shortest_path[startNode.name][EndNode.name]){
             path.push(node);
         }
+        // console.log("path:", path)
         // console.log("shortest path:", this.shortest_path[startNode.name][EndNode.name]);
         
         return path

@@ -85,30 +85,33 @@ class Agent{
             this.targetNode = this.next_ride;
             this.agentState = AgentStates.MOVING;
         }
-        console.debug("target node:", this.targetNode)
-        console.debug(this.satisfaction);
-        // console.log("this is curNode:", this.curNode);
+        console.log("this is curNode:", this.curNode);
+        console.debug("target node:", this.targetNode);
+        // console.debug(this.satisfaction);
+        
         // console.log("this is targetNode:", this.targetNode);
-        this.path = this.map.useShortestPath(this.curNode, this.targetNode);
-        this.path.shift();
+        this.movepath = this.map.useShortestPath(this.curNode, this.targetNode);
+        // console.log("initial path:",this.movepath);
+        this.movepath.shift();
+        // console.debug("next path:", this.movepath);
         this.startMoving();
     }
 
     startMoving(){
     // set the current node (to the next node)
-    this.curNode = this.path[0];
+    this.curNode = this.movepath[0];
 
     // set the target coords (to the next node)
-    this.targetX = this.path[0].x;
-    this.targetY = this.path[0].y;
+    this.targetX = this.movepath[0].x;
+    this.targetY = this.movepath[0].y;
 
     this.initialX = this.x;
     this.initialY = this.y;
 
     this.lerpT = 0; // varies from 0 to 1
     this.timeRequired = dist(this.x, this.y, this.targetX, this.targetY) / this.moveSpeed;
-    console.debug("target X and Y:", this.targetX, this.targetY);
-    console.debug("initial lerpT:", this.lerpT)
+    // console.debug("target X and Y:", this.targetX, this.targetY);
+    // console.debug("initial lerpT:", this.lerpT)
     }
 
 
@@ -129,7 +132,7 @@ class Agent{
             
             case AgentStates.MOVING: case AgentStates.EXITING:
                 this.lerpT += deltaTime / (1000 * this.timeRequired);
-                console.debug(this.lerpT);
+                // console.debug(this.lerpT);
                 if (this.lerpT >= 1) {
                     this.x = this.targetX;
                     this.y = this.targetY;
@@ -139,7 +142,7 @@ class Agent{
                     } else {
                     // not yet reached the target node
                     // drop the front node (we're there already), and start moving again
-                    this.path.shift();
+                    this.movepath.shift();
                     this.startMoving();
                     }
                 }

@@ -31,7 +31,7 @@ const GG_HEIGHT = 50;
 const GG_WIDTH = 100;
 
 // simulation parameters
-const ARRIVAL_PROB = 0.2;
+const ARRIVAL_PROB = 0.09;
 
 // const CROWD_TURNAWAY_PROB = 0.9; // have x chance of leaving if the crowds are high
 // const CROWD_DEPARTURE_PROB = 0.4; // leaving if the crowds are high (after actually entering)
@@ -42,7 +42,7 @@ const DEPARTURE_PROB = 0.05; // low chance to leave for whatever other reason
 const TOLERANCE_PROB = 0.3; // proportion of all visitors that are tolerant
 
 
-const MOVE_SPEED = 100; // moves x units per second
+const MOVE_SPEED = 500; // moves x units per second
 
 // resources and images
 const ICON_WIDTH = 40;
@@ -54,7 +54,7 @@ const ENTRANCE_IMG_PATH = "images/gate.jpg";
 
 
 // application constants
-const FRAME_RATE = 30;
+const FRAME_RATE = 60;
 let frameRunning = 0;
 
 function getRandomColor() {
@@ -83,8 +83,8 @@ function getRandomRide(arr) {
 
 function getRideCapacity(ride_type) {
   var capacityDict = {
-    "ride_a": 10,
-    "ride_b": 5
+    "ride_a": 15,
+    "ride_b": 8
   }
   
   return ride_type in capacityDict ? capacityDict[ride_type] : 0
@@ -94,8 +94,8 @@ function getRideCapacity(ride_type) {
 
 function getRideDuration(ride_type) {
   var runtimeDict = {
-    "ride_a": 5,
-    "ride_b": 3
+    "ride_a": 2,
+    "ride_b": 1
   }
 
   return ride_type in runtimeDict ? runtimeDict[ride_type] : 0;

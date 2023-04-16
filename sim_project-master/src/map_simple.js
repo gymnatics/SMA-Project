@@ -316,9 +316,9 @@ class MapNode {
                 if (this.runDurations[i] <= 0) {
                     // this means the run is over
                     dones += 1;
-                for (const agt of this.ridingAgents[i]) {
-                    agt.doneRiding();
-                }
+                    for (const agt of this.ridingAgents[i]) {
+                        agt.doneRiding();
+                    }
                 }
             }
             // if there are rides that are complete, clear the arrays

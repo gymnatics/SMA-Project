@@ -81,7 +81,7 @@ function draw(){
     if (isRunning){
         frameRunning++;
         time += deltaTime /1000;
-        console.log(isSpawn);
+        // console.log(isSpawn);
         updateLoop();
         
     }
@@ -317,37 +317,7 @@ function createMap() {
     n2.addConnection(n2,1);
     n3.addConnection(n3,1);
     n4.addConnection(n4,1);
-    // n1.addConnection(n2,1);
-    // n1.addConnection(n3,1);
-    // n1.addConnection(n4,1);
-
-    // n2.addConnection(e,1);
-    // n2.addConnection(n1,1);
-    // n2.addConnection(n3,1);
-    // n2.addConnection(n4,1);
-    
-    // n3.addConnection(e,1);
-    // n3.addConnection(n1,1);
-    // n3.addConnection(n2,1);
-    // n3.addConnection(n4,1);
-
-    // n4.addConnection(e,1);
-    // n4.addConnection(n1,1);
-    // n4.addConnection(n2,1);
-    // n4.addConnection(n3,1);
-
-
-    
-
   
-    // set the global vars
-    //rides = [n1, n2, n3, n4];
-    // entrance = e;
-  
-    // initialise the actual map
-    // const nodes = [e, n1, n2, n3, n4];
-   
-    // connections = [[0,1],[0,2],[0,3],[0,4],[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
     simMap = new SimMap(nodes);
 }
 
@@ -361,10 +331,12 @@ function getAvgScore() {
 }
 
 function updateLoop() {
-    if (isSpawn == false){
-        addAgents();
-        isSpawn = true;
-    }
+    // if (isSpawn == false){
+    //     addAgents();
+    //     isSpawn = true;
+    // }
+
+    addAgents();
     
   
     for (let agent of agents) {
@@ -400,19 +372,45 @@ function updateLoop() {
   
 }
 
+function addAgents() {
+    if (Math.random() < ARRIVAL_PROB) {
+  
+        // increment number of visitors
+        totalVisitors++;
+  
+        const typeRNG = Math.random();
+        if (typeRNG < TOLERANCE_PROB) {
+            // console.log("priority entered");
+            const agent = new Agent(simMap, tolerance = true);
+            agents.push(agent);
+  
+        }
+        // need to instantiate a new agent, otherwise, it'll just be one agent being updated twice per loop
+        // possible to identify groupings within the agents? maybe some sort of id
+        // agents.push(agent);
+        else {
+            // console.log("entered");
+            const agent = new Agent(simMap, tolerance = false);
+            agents.push(agent);
+        }
+    }
+}
+
 // function addAgents() {
-//     if (Math.random() < ARRIVAL_PROB) {
+//     if (1 == 1) {
   
 //         // increment number of visitors
 //         totalVisitors++;
   
 //         const typeRNG = Math.random();
+//         // const typeRNG = 1;
 //         if (typeRNG < TOLERANCE_PROB) {
 //             // console.log("priority entered");
 //             const agent = new Agent(simMap, tolerance = true, score = 100);
 //             agents.push(agent);
   
 //         }
+        
 //         // need to instantiate a new agent, otherwise, it'll just be one agent being updated twice per loop
 //         // possible to identify groupings within the agents? maybe some sort of id
 //         // agents.push(agent);
@@ -423,32 +421,6 @@ function updateLoop() {
 //         }
 //     }
 // }
-
-function addAgents() {
-    if (1 == 1) {
-  
-        // increment number of visitors
-        totalVisitors++;
-  
-        const typeRNG = Math.random();
-        // const typeRNG = 1;
-        if (typeRNG < TOLERANCE_PROB) {
-            // console.log("priority entered");
-            const agent = new Agent(simMap, tolerance = true, score = 100);
-            agents.push(agent);
-  
-        }
-        
-        // need to instantiate a new agent, otherwise, it'll just be one agent being updated twice per loop
-        // possible to identify groupings within the agents? maybe some sort of id
-        // agents.push(agent);
-        else {
-            // console.log("entered");
-            const agent = new Agent(simMap, tolerance = false, score = 100);
-            agents.push(agent);
-        }
-    }
-}
 
 function removeAgents() {
 

@@ -59,16 +59,23 @@ class Agent{
 
     nextDestination(){
         this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
-        console.debug("rides:", this.map.rides);
+        // console.debug("rides:", this.map.rides);
         console.debug(this.satisfaction);
         // check the queue time for the next ride to determine next ride
         // agent state in chilling, will leave when score <= 0
         if (this.agentState == AgentStates.CHILLING && this.next_ride.getQueueTime() > this.limit){
             this.check_again = true;
-            while (this.check_again = true){
+            while (this.check_again === true){
                 this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
+                console.log("next ride:", this.next_ride);
+
+                
                 if (this.agentState == AgentStates.CHILLING && this.next_ride.getQueueTime() <= this.limit){
-                    this.check_again = false
+
+                    this.check_again = false;
+                    this.targetNode = this.next_ride;
+                    this.agentState = AgentStates.MOVING;
+                
                 }   
             }
 
@@ -136,12 +143,12 @@ class Agent{
             
             case AgentStates.MOVING: case AgentStates.EXITING:
                 this.lerpT += deltaTime / (1000 * this.timeRequired);
-                console.debug(this.lerpT);
+                // console.debug(this.lerpT);
                 if (this.lerpT >= 1) {
                     this.x = this.targetX;
                     this.y = this.targetY;
-                    // this.timeRequired = dist(this.x, this.y, this.targetX, this.targetY) / this.moveSpeed;
                     if (this.curNode === this.targetNode) {
+                        this.lerpT = 0;
                         if (this.agentState == AgentStates.MOVING) this.agentState = AgentStates.REACHED;
                         else this.agentState = AgentStates.EXITED;
                     } else {
@@ -166,8 +173,7 @@ class Agent{
             case AgentStates.FINISHED:
 
                 this.agentState = AgentStates.CHILLING;
-                this.lerpT = 0;
-                this.satisfaction += 0.01;
+                this.satisfaction += 0.1;
                 
                 break;
 
@@ -185,6 +191,7 @@ class Agent{
         this.numRidesTaken++;
         const queueTime = (frameRunning - this.startQueueTime) / FRAME_RATE;
         this.timeQueueing += queueTime;
+        this.current_cap ++;
         
     }
 
@@ -198,7 +205,7 @@ class Agent{
         strokeWeight(0.5);
         fill(this.fill);
         if (this.agentState == AgentStates.MOVING || this.agentState == AgentStates.EXITING) {
-            console.debug("before lerp:", this.x, this.y)
+            // console.debug("before lerp:", this.x, this.y)
             this.x = lerp(this.initialX, this.targetX, this.lerpT);
             this.y = lerp(this.initialY, this.targetY, this.lerpT);
         }

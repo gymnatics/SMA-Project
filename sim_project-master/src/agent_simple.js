@@ -64,12 +64,12 @@ class Agent{
         // check the queue time for the next ride to determine next ride
         // agent state in chilling, will leave when score <= 0
         if (this.agentState == AgentStates.CHILLING && this.next_ride.getQueueTime() > this.limit){
-            // this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
-            // this.satisfaction = this.satisfaction - 5;
-            if (this.satisfaction <= 0){
-                this.targetNode = this.map.entrance;
-                this.agentState = AgentStates.EXITING;
-                this.fill = "white";
+            this.check_again = true;
+            while (this.check_again = true){
+                this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
+                if (this.agentState == AgentStates.CHILLING && this.next_ride.getQueueTime() <= this.limit){
+                    this.check_again = false
+                }   
             }
 
         } else if (this.satisfaction >= MAX_SATISFACTION){
@@ -77,8 +77,13 @@ class Agent{
             this.targetNode = this.map.entrance;
             this.agentState = AgentStates.EXITING;
             this.fill = "white";
-        }
-        else{
+
+        }else if (this.satisfaction <= 0){
+            this.targetNode = this.map.entrance;
+            this.agentState = AgentStates.EXITING;
+            this.fill = "white";
+
+        }else{
             // //generate choice of next ride randomly
             // this.next_ride = this.map.rides[Math.floor(Math.random()*this.map.rides.length)];
             this.targetNode = this.next_ride;
@@ -125,7 +130,7 @@ class Agent{
 
             case AgentStates.CHILLING:
                 //pick a random ride to head to
-                this.satisfaction -= 5;
+                this.satisfaction -= 0.005;
                 this.nextDestination();
                 break;
             
@@ -159,8 +164,11 @@ class Agent{
                 break;
             
             case AgentStates.FINISHED:
-                this.satisfaction += 10;
+
                 this.agentState = AgentStates.CHILLING;
+                this.lerpT = 0;
+                this.satisfaction += 0.01;
+                
                 break;
 
         }
@@ -181,7 +189,7 @@ class Agent{
     }
 
     doneRiding(){
-        this.satisfaction -= this.queue_w;
+        this.satisfaction -= (this.queue_w/1000).toFixed(2);
         this.agentState = AgentStates.FINISHED;
         
     }
@@ -190,6 +198,7 @@ class Agent{
         strokeWeight(0.5);
         fill(this.fill);
         if (this.agentState == AgentStates.MOVING || this.agentState == AgentStates.EXITING) {
+            console.debug("before lerp:", this.x, this.y)
             this.x = lerp(this.initialX, this.targetX, this.lerpT);
             this.y = lerp(this.initialY, this.targetY, this.lerpT);
         }

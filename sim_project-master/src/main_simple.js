@@ -233,7 +233,8 @@ function drawStats() {
     Total visitors (lifetime): ${totalVisitors}
     Current visitors: ${totalVisitors - numExitedAgents}
     Average time spent (per visitor): ${(totalTimeSpent / exitedVisitors).toFixed(3)}
-    Average queue time (per ride): ${(averageQueueTime).toFixed(3)}`;
+    Average queue time (per ride): ${(averageQueueTime).toFixed(3)}
+    Average satisfaction (per visitor): ${(avgScore.toFixed(3))}`;
     
   
     text(statsString, WIDTH / 2, HEIGHT - STATS_HEIGHT + 10);
@@ -350,6 +351,15 @@ function createMap() {
     simMap = new SimMap(nodes);
 }
 
+// NEW: to calculate average score of the customers
+function getAvgScore() {
+    let totalScore = 0; // get totalScore to track the total score
+    for (let agent of agents) {
+        totalScore += agent.satisfaction // add each agent's satisfaction to totalScore
+    }
+    return totalScore / agents.length; // average score = total score / total number of agents
+}
+
 function updateLoop() {
     if (isSpawn == false){
         addAgents();
@@ -383,6 +393,8 @@ function updateLoop() {
     
         avgQueueTimeHist.push(averageQueueTime);
         // Need to add avgScoreHist data!!
+        avgScore = getAvgScore();
+        avgScoreHist.push(avgScore);
         
     }
   

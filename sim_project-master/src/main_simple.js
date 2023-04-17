@@ -33,6 +33,7 @@ let avgScore = 0;
 let avgScoreHist = [];
 
 let isSpawn = false;
+let intervalID;
 
 function setup(){
     createCanvas(WIDTH, HEIGHT);
@@ -82,7 +83,10 @@ function draw(){
         frameRunning++;
         time += deltaTime /1000;
         // console.log(isSpawn);
-        updateLoop();
+        
+    
+        // setInterval(updateLoop,500);
+        // updateLoop();
         
     }
 
@@ -109,6 +113,13 @@ function mouseClicked() {
 
 function toggleSim() {
     isRunning = !isRunning;
+    
+    if (isRunning){
+        intervalID = setInterval(updateLoop,100);
+        
+    } else{
+        clearInterval(intervalID);
+    }
 }
   
 function resetSim() {
@@ -333,7 +344,12 @@ function getAvgScore() {
 function updateLoop() {
     // if (isSpawn == false){
     //     addAgents();
-    //     isSpawn = true;
+    //     let count = 0
+    //     count += 1
+    //     if (count == 10){
+    //         isSpawn = true;
+    //     }
+        
     // }
 
     addAgents();

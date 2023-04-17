@@ -76,17 +76,12 @@ class Agent {
       this.agentState = AgentStates.EXITING;
       this.fill = "white";
 
-    } else if ((this.numRidesTaken >= int(ceil(RIDES_FOR_SATISFACTION * this.map.rides.length))) || ((this.satisfaction >= MAX_SATISFACTION) || (this.satisfaction <= 0))) {
+    } else if (((this.satisfaction >= MAX_SATISFACTION) || (this.satisfaction <= 0))) {
       // check to see if this agent will leave based on the number of rides taken
       this.targetNode = this.map.entrance;
       this.agentState = AgentStates.EXITING;
       this.fill = "white";
 
-    } else if (this.agentState != AgentStates.ENTERED && Math.random() < DEPARTURE_PROB) {
-      // randomly leaving
-      this.targetNode = this.map.entrance;
-      this.agentState = AgentStates.EXITING;
-      this.fill = "white";
     } else {
 
       // pick another ride
@@ -168,10 +163,14 @@ class Agent {
         if (this.lerpT >= 1) {
           this.x = this.targetX;
           this.y = this.targetY;
-          this.satifaction -= 1;
+          
           if (this.curNode === this.targetNode) {
-            if (this.agentState == AgentStates.MOVING) this.agentState = AgentStates.REACHED;
-            else this.agentState = AgentStates.EXITED;
+            if (this.agentState == AgentStates.MOVING){
+              // this.satifaction -= 5;
+              this.agentState = AgentStates.REACHED;
+            } else{
+              this.agentState = AgentStates.EXITED;
+              }
           } else {
             // not yet reached the target node
             // drop the front node (we're there already), and start moving again
@@ -194,6 +193,7 @@ class Agent {
         this.nextDestination();
         break;
     }
+    console.debug("satisfaction:", this.satisfaction);
   }
 
   // putting this here just to keep track of when the agent starts queuing
@@ -207,12 +207,24 @@ class Agent {
     this.numRidesTaken++;
     const queueTime = (frameRunning - this.startQueueTime) / FRAME_RATE;
     this.timeSpentQueuing += queueTime;
-    this.satisfaction -= 2;
+    this.satisfaction -= this.timeSpentQueuing*this.m2;
+    // console.debug("satisfaction queue:", this.satisfaction)
   }
 
   doneRiding() {
+    if (this.curNode.type == "ride_a"){
+      // console.log("curNode:", this.curNode);
+      this.satisfaction += 50
+      // console.log("satisfaction a:", this.satisfaction);
+    }
+    if (this.curNode.type == "ride_b"){
+      // console.log("curNode:", this.curNode);
+      this.satisfaction += 30
+      // console.log("satisfaction b:", this.satisfaction);
+    }
+    
     this.agentState = AgentStates.FINISHED;
-    this.satisfaction += 10
+    
   }
 
   draw() {

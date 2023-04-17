@@ -29,6 +29,10 @@ let agtsLeftHist = [];
 let numExitedAgents = 0;
 
 let averageQueueTime = 0;
+let avgQueueA = 0;
+let avgQueueB = 0;
+let avgQueueAHist = [];
+let avgQueueBHist = [];
 let avgQueueTimeHist = [];
 let minQueueTimeHist = [];
 
@@ -215,6 +219,10 @@ function resetSim() {
 
   averageQueueTime = 0;
   avgQueueTimeHist = [];
+  avgQueueA = 0;
+  avgQueueB = 0;
+  avgQueueAHist = [];
+  avgQueueBHist = [];
   minQueueTimeHist = [];
 
   avgScore = 0;
@@ -257,9 +265,9 @@ function exportCSV() {
   // timeHist, minQueueTimeHist, avgQueueTimeHist, agtsLeftHist, totalVisitorsHist, timeSpentHist, timeQueueHist
   let table = new p5.Table();
 
-  table.columns = ["time", "min_wait_time", "avg_wait_time", "agts_left", "total_agts", "time_in_park", "time_in_queue", "average_score"];
+  table.columns = ["time", "avg_queue_time_a","avg_queue_time_b", "avg_wait_time", "agts_left", "total_agts", "time_in_park", "time_in_queue", "average_score"];
 
-  let data = [timeHist, minQueueTimeHist, avgQueueTimeHist, agtsLeftHist, totalVisitorsHist, timeSpentHist, timeQueueHist, avgScoreHist];
+  let data = [timeHist, avgQueueAHist,avgQueueBHist, avgQueueTimeHist, agtsLeftHist, totalVisitorsHist, timeSpentHist, timeQueueHist, avgScoreHist];
   console.log(data);
   for (let j = 0; j < data[0].length; j++) {
     let rowData = [];
@@ -413,6 +421,7 @@ function createMap() {
 function getAvgScore() {
   let totalScore = 0; // get totalScore to track the total score
   for (let agent of agents) {
+      
       totalScore += agent.satisfaction // add each agent's satisfaction to totalScore
   }
 
@@ -438,6 +447,8 @@ function updateLoop() {
 
   // calculate averageQueueTime (because there's nowhere else to calculate this)
   averageQueueTime = simMap.getAverageQueueTime();
+  avgQueueA = simMap.getAverageQueueTime_A();
+  avgQueueB = simMap.getAverageQueueTime_B();
 
   // update the histories with the calculated data
   const exitedVisitors = max(1, numExitedAgents);
@@ -454,6 +465,8 @@ function updateLoop() {
 
     avgQueueTimeHist.push(averageQueueTime);
     minQueueTimeHist.push(simMap.getMinQueueTime());
+    avgQueueAHist.push(avgQueueA);
+    avgQueueBHist.push(avgQueueB);
 
     avgScore = getAvgScore();
     avgScoreHist.push(avgScore);

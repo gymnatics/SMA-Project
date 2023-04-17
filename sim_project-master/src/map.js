@@ -241,6 +241,30 @@ class SimMap {
     return totalQueueTimes / this.rides.length;
   }
 
+  getAverageQueueTime_A(){
+    let totalQueueA = 0;
+    let numA = 0;
+    for (let ride of this.rides){
+      if (ride.type == "ride_a"){
+        numA += 1;
+        totalQueueA += ride.getQueueTime();
+      }
+    }
+    return totalQueueA / numA;
+  }
+
+  getAverageQueueTime_B(){
+    let totalQueueB = 0;
+    let numB = 0;
+    for (let ride of this.rides){
+      if (ride.type == "ride_b"){
+        numB += 1;
+        totalQueueB += ride.getQueueTime();
+      }
+    }
+    return totalQueueB / numB;
+  }
+
   getMinQueueTime() {
     let minQueueTime = this.rides[0].getQueueTime();
     for (let i = 1; i < this.rides.length; i++) {

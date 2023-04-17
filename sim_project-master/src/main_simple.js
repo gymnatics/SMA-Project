@@ -86,7 +86,7 @@ function draw(){
         
     
         // setInterval(updateLoop,500);
-        // updateLoop();
+        updateLoop();
         
     }
 
@@ -114,12 +114,12 @@ function mouseClicked() {
 function toggleSim() {
     isRunning = !isRunning;
     
-    if (isRunning){
-        intervalID = setInterval(updateLoop,100);
+    // if (isRunning){
+    //     intervalID = setInterval(updateLoop,100);
         
-    } else{
-        clearInterval(intervalID);
-    }
+    // } else{
+    //     clearInterval(intervalID);
+    // }
 }
   
 function resetSim() {
@@ -337,22 +337,18 @@ function getAvgScore() {
     let totalScore = 0; // get totalScore to track the total score
     for (let agent of agents) {
         totalScore += agent.satisfaction // add each agent's satisfaction to totalScore
+        console.log(agents)
     }
     return totalScore / agents.length; // average score = total score / total number of agents
 }
 
 function updateLoop() {
-    // if (isSpawn == false){
-    //     addAgents();
-    //     let count = 0
-    //     count += 1
-    //     if (count == 10){
-    //         isSpawn = true;
-    //     }
-        
-    // }
+    if (isSpawn == false){
+        addAgents();
+        isSpawn = true;     
+    }
 
-    addAgents();
+    // addAgents();
     
   
     for (let agent of agents) {
@@ -388,55 +384,55 @@ function updateLoop() {
   
 }
 
-function addAgents() {
-    if (Math.random() < ARRIVAL_PROB) {
-  
-        // increment number of visitors
-        totalVisitors++;
-  
-        const typeRNG = Math.random();
-        if (typeRNG < TOLERANCE_PROB) {
-            // console.log("priority entered");
-            const agent = new Agent(simMap, tolerance = true);
-            agents.push(agent);
-  
-        }
-        // need to instantiate a new agent, otherwise, it'll just be one agent being updated twice per loop
-        // possible to identify groupings within the agents? maybe some sort of id
-        // agents.push(agent);
-        else {
-            // console.log("entered");
-            const agent = new Agent(simMap, tolerance = false);
-            agents.push(agent);
-        }
-    }
-}
-
 // function addAgents() {
-//     if (1 == 1) {
+//     if (Math.random() < ARRIVAL_PROB) {
   
 //         // increment number of visitors
 //         totalVisitors++;
   
 //         const typeRNG = Math.random();
-//         // const typeRNG = 1;
 //         if (typeRNG < TOLERANCE_PROB) {
 //             // console.log("priority entered");
-//             const agent = new Agent(simMap, tolerance = true, score = 100);
+//             const agent = new Agent(simMap, tolerance = true);
 //             agents.push(agent);
   
 //         }
-        
 //         // need to instantiate a new agent, otherwise, it'll just be one agent being updated twice per loop
 //         // possible to identify groupings within the agents? maybe some sort of id
 //         // agents.push(agent);
 //         else {
 //             // console.log("entered");
-//             const agent = new Agent(simMap, tolerance = false, score = 100);
+//             const agent = new Agent(simMap, tolerance = false);
 //             agents.push(agent);
 //         }
 //     }
 // }
+
+function addAgents() {
+    if (1 == 1) {
+  
+        // increment number of visitors
+        totalVisitors++;
+  
+        const typeRNG = Math.random();
+        // const typeRNG = 1;
+        if (typeRNG < TOLERANCE_PROB) {
+            // console.log("priority entered");
+            const agent = new Agent(simMap, tolerance = true, score = 100);
+            agents.push(agent);
+  
+        }
+        
+        // need to instantiate a new agent, otherwise, it'll just be one agent being updated twice per loop
+        // possible to identify groupings within the agents? maybe some sort of id
+        // agents.push(agent);
+        else {
+            // console.log("entered");
+            const agent = new Agent(simMap, tolerance = false, score = 100);
+            agents.push(agent);
+        }
+    }
+}
 
 function removeAgents() {
 

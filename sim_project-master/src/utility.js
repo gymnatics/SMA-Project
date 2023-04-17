@@ -42,7 +42,7 @@ const DEPARTURE_PROB = 0.05; // low chance to leave for whatever other reason
 const TOLERANCE_PROB = 0.3; // proportion of all visitors that are tolerant
 
 
-const MOVE_SPEED = 500; // moves x units per second
+const MOVE_SPEED = 100; // moves x units per second
 
 // resources and images
 const ICON_WIDTH = 40;
@@ -54,7 +54,7 @@ const ENTRANCE_IMG_PATH = "images/gate.jpg";
 
 
 // application constants
-const FRAME_RATE = 60;
+const FRAME_RATE = 30;
 let frameRunning = 0;
 
 function getRandomColor() {

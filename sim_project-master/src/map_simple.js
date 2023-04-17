@@ -85,7 +85,7 @@ class SimMap {
     }
 
     useShortestPath(startNode,EndNode){
-        const path = [startNode]
+        let path = [startNode];
         for (let node of this.shortest_path[startNode.name][EndNode.name]){
             path.push(node);
         }
@@ -124,33 +124,38 @@ class SimMap {
         }
     }
 
-    // getRideInfoFromNode(startNode) {
-    //     let retInfo = [];
-    //     let startNodeIndex;
-    //     for (let i = 0; i < this.nodes.length; i++) {
-    //         if (this.nodes[i] === startNode) {
-    //             startNodeIndex = i;
-    //             break;
-    //         }
-    //     }
-    //     let minQ = Infinity, maxQ = 0
-    //     for (let i = 0; i < this.nodes.length; i++) {
-    //         // we only want to get ride info (get queue time )
-    //         if (i != startNodeIndex && (this.nodes[i].type == "ride_a" || this.nodes[i].type == "ride_b" )) {
-    //             const queue = this.nodes[i].getQueueTime();
-    //             minQ = min(queue, minQ);
-    //             maxQ = max(queue, maxQ);
-    //             retInfo.push([queue, this.nodes[i]]);
-    //         }
-    //     }
-    //     // normalise this info (so that we can score the rides effectively)
-    //     const rangeQ = max(maxQ - minQ, 0.1);
-    //     // console.log(rangeQ + " " + rangeD);
-    //     for (let i = 0; i < retInfo.length; i++) {
-    //         retInfo[i][0] = 1 - (retInfo[i][1] - minQ) / rangeQ;
-    //     }
-    //     return retInfo;
-    // }
+    getRideInfoFromNode(startNode) {
+        let retInfo = [];
+        let startNodeIndex;
+        for (let i = 0; i < this.nodes.length; i++) {
+          if (this.nodes[i] === startNode) {
+            startNodeIndex = i;
+            break;
+          }
+        }
+        let minQ = Infinity, maxQ = 0, minD = Infinity, maxD = 0;
+        for (let i = 0; i < this.nodes.length; i++) {
+          // we only want to get ride info (get queue time and distance)
+          if (i != startNodeIndex && this.nodes[i].type == "ride") {
+            const queue = this.nodes[i].getQueueTime();
+            const distance = this.dist[startNodeIndex][i];
+            minQ = min(queue, minQ);
+            maxQ = max(queue, maxQ);
+            minD = min(distance, minD);
+            maxD = max(distance, maxD);
+            retInfo.push([distance, queue, this.nodes[i]]);
+          }
+        }
+        // normalise this info (so that we can score the rides effectively)
+        const rangeQ = max(maxQ - minQ, 0.1);
+        const rangeD = max(maxD - minD, 1);
+        // console.log(rangeQ + " " + rangeD);
+        for (let i = 0; i < retInfo.length; i++) {
+          retInfo[i][0] = 1 - (retInfo[i][0] - minD) / rangeD;
+          retInfo[i][1] = 1 - (retInfo[i][1] - minQ) / rangeQ;
+        }
+        return retInfo;
+    }
 
     getAverageQueueTime() {
         let totalQueueTimes = 0;
@@ -299,10 +304,14 @@ class MapNode {
         if (!this.queue.isEmpty() && this.current_cap < this.capacity) {
             let agents = [];
             const agt = this.queue.pop()[1];
+            
             agt.startRiding();
+            console.debug("start riding");
             agents.push(agt)
 
         }
+        console.debug("current cap:", this.current_cap);
+        console.debug("capacity:", this.capacity);
         this.ridingAgents.push(agents)
         this.runDurations.push(this.duration);
 
@@ -318,7 +327,9 @@ class MapNode {
                     dones += 1;
                     for (const agt of this.ridingAgents[i]) {
                         agt.doneRiding();
+                        this.current_cap = Math.max(0,this.current_cap-1);
                         console.log("done riding")
+                        
                     }
                 }
             }

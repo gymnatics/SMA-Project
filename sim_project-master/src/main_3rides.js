@@ -38,6 +38,9 @@ let avgQueueCHist = [];
 let avgQueueTimeHist = [];
 let minQueueTimeHist = [];
 
+let avgProfits = 0;
+let avgProfitsHist = [];
+
 let avgScore = 0;
 let avgScoreHist = [];
 
@@ -229,6 +232,9 @@ function resetSim() {
   avgQueueCHist = [];
   minQueueTimeHist = [];
 
+  avgProfits = 0;
+  avgProfitsHist = [];
+
   avgScore = 0;
   avgScoreHist = [];
 
@@ -269,9 +275,9 @@ function exportCSV() {
   // timeHist, minQueueTimeHist, avgQueueTimeHist, agtsLeftHist, totalVisitorsHist, timeSpentHist, timeQueueHist
   let table = new p5.Table();
 
-  table.columns = ["time", "avg_queue_time_a", "avg_queue_time_b", "avq_queue_time_c", "avg_wait_time", "agts_left", "total_agts", "time_in_park", "time_in_queue", "average_score"];
+  table.columns = ["time", "avg_queue_time_a", "avg_queue_time_b", "avq_queue_time_c", "avg_wait_time", "agts_left", "total_agts", "time_in_park", "time_in_queue", "average_score", "average_profits"];
 
-  let data = [timeHist, avgQueueAHist, avgQueueBHist, avgQueueCHist, avgQueueTimeHist, agtsLeftHist, totalVisitorsHist, timeSpentHist, timeQueueHist, avgScoreHist];
+  let data = [timeHist, avgQueueAHist, avgQueueBHist, avgQueueCHist, avgQueueTimeHist, agtsLeftHist, totalVisitorsHist, timeSpentHist, timeQueueHist, avgScoreHist, avgProfitsHist];
   console.log(data);
   for (let j = 0; j < data[0].length; j++) {
     let rowData = [];
@@ -349,7 +355,7 @@ function drawStats() {
   const btmBorder = HEIGHT;
 
   // possible todo: remove the magic numbers
-  drawGraph("time in park", timeSpentHist, leftBorder + 25, btmBorder - 60, 30);
+  drawGraph("average profits", avgProfitsHist, leftBorder + 25, btmBorder - 60, 30);
   drawGraph("average satisfaction", avgScoreHist, leftBorder + 150, btmBorder - 60, 1);
   drawGraph("ride queue times", avgQueueTimeHist, leftBorder + 275, btmBorder - 60, 10);
 
@@ -436,6 +442,21 @@ function getAvgScore() {
     return totalScore / agents.length; // average score = total score / total number of agents
   }
 }
+
+function getAverageProfits() {
+    let totalProfits = 0; // get totalProfits to track the total profits
+    for (let agent of agents) {
+        
+        totalProfits += agent.profit // add each agent's satisfaction to totalScore
+    }
+  
+    if (agents.length == 0){
+      return 0
+    } 
+    else{
+      return totalProfits / agents.length; // average score = total score / total number of agents
+    }
+  }
   
 
 function updateLoop() {
@@ -473,6 +494,9 @@ function updateLoop() {
     avgQueueAHist.push(avgQueueA);
     avgQueueBHist.push(avgQueueB);
     avgQueueCHist.push(avgQueueC);
+
+    avgProfits = getAverageProfits();
+    avgProfitsHist.push(avgProfits);
 
     avgScore = getAvgScore();
     avgScoreHist.push(avgScore);

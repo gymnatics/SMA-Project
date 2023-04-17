@@ -27,6 +27,7 @@ const AgentStates = {
       this.enteredTime = frameRunning;
       this.timeSpentQueuing = 0;
       this.numRidesTaken = 0;
+      this.profit = 0;
   
       // need to also set some weights on whether to choose to go for near ones or far ones
       // given a ride with distance d and waiting time w, the score of the ride is
@@ -193,7 +194,7 @@ const AgentStates = {
           this.nextDestination();
           break;
       }
-      console.debug("satisfaction:", this.satisfaction);
+    //   console.debug("satisfaction:", this.satisfaction);
     }
   
     // putting this here just to keep track of when the agent starts queuing
@@ -215,18 +216,22 @@ const AgentStates = {
       if (this.curNode.type == "ride_a"){
         // console.log("curNode:", this.curNode);
         this.satisfaction += 50
+        this.profit += 5 - 2
         // console.log("satisfaction a:", this.satisfaction);
       }
       if (this.curNode.type == "ride_b"){
         // console.log("curNode:", this.curNode);
         this.satisfaction += 30
+        this.profit += 4 - 2
         // console.log("satisfaction b:", this.satisfaction);
       }
       if (this.curNode.type == "ride_c"){
         // console.log("curNode:", this.curNode);
         this.satisfaction += 40
+        this.profit += 3 - 2
         // console.log("satisfaction b:", this.satisfaction);
       }
+      console.log("profits", this.profit)
       
       this.agentState = AgentStates.FINISHED;
       

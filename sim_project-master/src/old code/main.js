@@ -1,9 +1,12 @@
 // global vars
+
+// For ours, just set it such that the nodes are pre-set, aka create the array with presets
 let simMap;
 let nodes = [];
 let connections = [];
-let entrance;
-let rides;
+// let entrance;
+// let rides;
+// let ride_types = ["ride_a","ride_b"];
 let agents = [];
 let isRunning = false;
 let showStats = true;
@@ -35,11 +38,7 @@ let minQueueTimeHist = [];
 let avgScore = 0;
 let avgScoreHist = [];
 
-// creator mode
-let creatorMode = false;
-let selected = false;
-let selectedNodeIndex = -1;
-let selecting = false;
+
 
 function setup() {
   createCanvas(WIDTH, HEIGHT);
@@ -58,7 +57,6 @@ function setup() {
   const statsBtn = createButton("Show/Hide global statistics");
   const csvBtn = createButton("Export statistics (CSV)");
   const pBtn = createP();
-  const createBtn = createButton("Toggle creator/simulator mode");
   const defaultMapBtn = createButton("Create default map");
   const resetMapBtn = createButton("Clear map");
 
@@ -67,17 +65,15 @@ function setup() {
   statsBtn.parent(divs);
   csvBtn.parent(divs);
   pBtn.parent(divs);
-  createBtn.parent(divs);
   defaultMapBtn.parent(divs);
-  resetMapBtn.parent(divs);
+  //resetMapBtn.parent(divs);
 
   startBtn.mouseClicked(toggleSim);
   resetBtn.mouseClicked(resetSim);
   statsBtn.mouseClicked(toggleStats);
   csvBtn.mouseClicked(exportCSV);
-  createBtn.mouseClicked(toggleCreate);
   defaultMapBtn.mouseClicked(defaultMap);
-  resetMapBtn.mouseClicked(resetMap);
+  //resetMapBtn.mouseClicked(resetMap);
 }
 
 function draw() {
@@ -88,101 +84,43 @@ function draw() {
   text(`${time.toFixed(2)}\n${frameRunning}\n${timeHist.length}`, WIDTH - 5, 5);
 
   if (simMap) {
-    simMap.drawMap(creatorMode);
+    simMap.drawMap();
   }
 
   // update function
-  if (!creatorMode) {
 
-    if (isRunning) {
-      frameRunning++;
-      time += deltaTime / 1000;
-      updateLoop();
-    }
-
-    // keep drawing agents
-    for (let agent of agents) {
-      agent.draw();
-    }
-
-    drawRunning();
-
-    drawDisplay();
-
-    if (showStats) {
-      drawStats();
-    }
-
-  } else {
-    // creator mode loop
-    fill(255);
-    textAlign(RIGHT, TOP);
-    text("=== Instructions ===\n\
-          Click to place a new node\nDrag from one node to another to form a route\nClick node to toggle its type\nEvery ride must be reachable from the entrance\n\
-          ==== Colour Key ====\n\
-          orange: entrance (max 1)\ncyan: ride\nblack: junction", WIDTH - TEXT_PADDING_RIGHT, TEXT_PADDING_TOP)
-
-    let flag = false;
-    for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i];
-      if (dist(node.x, node.y, mouseX, mouseY) < SELECT_RADIUS) {
-        noStroke();
-        fill(200, 200, 200, 120);
-        circle(node.x, node.y, 2 * SELECT_RADIUS);
-        flag = true;
-        if (!selected && mouseIsPressed) {
-          selectedNodeIndex = i;
-          selected = true;
-        } else if (selected && !mouseIsPressed) {
-          // make sure this new connection isn't an existing one
-          let flag = true;
-          for (let connection of connections) {
-            if ((connection[0] == i && connection[1] == selectedNodeIndex) || (connection[0] == selectedNodeIndex && connection[1] == i)) flag = false;
-          }
-          if (flag) {
-            connections.push([selectedNodeIndex, i]);
-            simMap.connectNode(selectedNodeIndex, i);
-          }
-        }
-      }
-    }
-    selecting = flag;
-
-    if (selected) {
-      const node = nodes[selectedNodeIndex];
-      stroke("#f5220f");
-      line(node.x, node.y, mouseX, mouseY);
-      if (!mouseIsPressed) {
-        selected = false;
-        if (dist(node.x, node.y, mouseX, mouseY) < SELECT_RADIUS) {
-          node.toggleType();
-        }
-      }
-    }
+  if (isRunning) {
+    frameRunning++;
+    time += deltaTime / 1000;
+    updateLoop();
   }
+
+  // keep drawing agents
+  for (let agent of agents) {
+    agent.draw();
+  }
+
+  drawRunning();
+
+  drawDisplay();
+
+  if (showStats) {
+    drawStats();
+  }
+
 }
 
 function mouseClicked() {
-  if (creatorMode && !selecting && mouseX > 0 && mouseY > 0 && mouseX < WIDTH && mouseY < HEIGHT) {
-    const node = new MapNode("ride", mouseX / WIDTH, mouseY / HEIGHT);
-    nodes.push(node);
-    if (simMap == null) {
-      simMap = new SimMap(nodes, connections);
-    }
+   
+  if (simMap == null) {
+    simMap = new SimMap(nodes, connections);
   }
+  
 }
 
-function checkMap() {
-  if (simMap == null || !simMap.checkMap()) {
-    alert("Invalid map");
-    creatorMode = true;
-  } else {
-    creatorMode = false;
-  }
-}
+
 
 function toggleSim() {
-  checkMap();
   isRunning = !isRunning;
 }
 
@@ -217,9 +155,6 @@ function resetSim() {
   avgQueueTimeHist = [];
   minQueueTimeHist = [];
 
-  avgScore = 0;
-  avgScoreHist = [];
-
 
   for (const node of nodes) {
     node.reset();
@@ -227,24 +162,24 @@ function resetSim() {
 }
 
 function defaultMap() {
-  if (creatorMode) createMap();
+  createMap();
 }
 
-function resetMap() {
-  if (creatorMode) {
-    rideID = 0;
-    simMap = null;
-    nodes = [];
-    connections = [];
-  }
-}
+// function resetMap() {
+//   if (creatorMode) {
+//     rideID = 0;
+//     simMap = null;
+//     nodes = [];
+//     connections = [];
+//   }
+// }
 
-function toggleCreate() {
-  resetSim();
-  creatorMode = !creatorMode;
+// function toggleCreate() {
+//   resetSim();
+//   creatorMode = !creatorMode;
 
-  if (!creatorMode) checkMap();
-}
+//   if (!creatorMode) checkMap();
+// }
 
 function toggleStats() {
   showStats = !showStats;
@@ -257,7 +192,7 @@ function exportCSV() {
   // timeHist, minQueueTimeHist, avgQueueTimeHist, agtsLeftHist, totalVisitorsHist, timeSpentHist, timeQueueHist
   let table = new p5.Table();
 
-  table.columns = ["time", "min_wait_time", "avg_wait_time", "agts_left", "total_agts", "time_in_park", "time_in_queue", "average_score"];
+  table.columns = ["time", "min_wait_time", "avg_wait_time", "agts_left", "total_agts", "time_in_park", "time_in_queue","average_score"];
 
   let data = [timeHist, minQueueTimeHist, avgQueueTimeHist, agtsLeftHist, totalVisitorsHist, timeSpentHist, timeQueueHist, avgScoreHist];
   console.log(data);
@@ -275,9 +210,8 @@ function exportCSV() {
 
 function drawDisplay() {
   for (let node of nodes) {
-    if (dist(node.x, node.y, mouseX, mouseY) < HOVER_RADIUS && ((node.type == "ride_a") || (node.type == "ride_b"))) {
+    if (dist(node.x, node.y, mouseX, mouseY) < HOVER_RADIUS && (node.type == "ride_a" || node.type =="ride_b")) {
       // draw a rectangle at the top left to display info
-      rectMode(CORNER);
       fill(255, 255, 255, 60);
       stroke(0);
       strokeWeight(0.5);
@@ -311,7 +245,6 @@ function drawRunning() {
 
 function drawStats() {
   // draw a rectangle near the bottom of the screen to display statistics
-  rectMode(CORNER);
   fill(155);
   stroke(0);
   strokeWeight(0.5);
@@ -327,7 +260,7 @@ function drawStats() {
   statsString = `=== Global Stats ===
   Total visitors (lifetime): ${totalVisitors}
   Current visitors: ${totalVisitors - numExitedAgents}
-  Average satisfaction (per visitor): ${(avgScore.toFixed(3))}
+  Missed visitors: ${totalAgtsLeft}
   Average time spent (per visitor): ${(totalTimeSpent / exitedVisitors).toFixed(3)}
   Average queue time (per ride): ${(averageQueueTime).toFixed(3)}`;
 
@@ -338,7 +271,7 @@ function drawStats() {
 
   // possible todo: remove the magic numbers
   drawGraph("time in park", timeSpentHist, leftBorder + 25, btmBorder - 60, 30);
-  drawGraph("average satisfaction", avgScoreHist, leftBorder + 150, btmBorder - 60, 1);
+  drawGraph("missed fraction", agtsLeftHist, leftBorder + 150, btmBorder - 60, 1);
   drawGraph("ride queue times", avgQueueTimeHist, leftBorder + 275, btmBorder - 60, 10);
 
 }
@@ -380,50 +313,33 @@ function drawGraph(title, data, x, y, defMax) {
 }
 
 function createMap() {
-  // reset the rideID
-  rideID = 0;
-
+  
   // initialise a basic map (0,0 top left; 1,1 btm right)
   let e = new MapNode("entrance", 0.5, 0.6);
-  let n1 = new MapNode("ride_a", 0.5, 0.45);
-  let n2 = new MapNode("junc", 0.5, 0.35);
-  let n3 = new MapNode("ride_b", 0.3, 0.3);
-  let n4 = new MapNode("ride_a", 0.7, 0.3);
-  let n5 = new MapNode("junc", 0.5, 0.2);
-  let n6 = new MapNode("ride_b", 0.5, 0.2);
-  let n7 = new MapNode("ride_a", 0.7, 0.45);
-  // let n8 = new MapNode("ride_b", 0.5, 0.4);
-  // let n9 = new MapNode("ride_a", 0.7, 0.3);
-  // let n10 = new MapNode("ride_b", 0.4, 0.2);
-  // let n11 = new MapNode("junc", 0.5, 0.3);
-  // let n12 = new MapNode("ride_a", 0.6, 0.2);
+  let n1 = new MapNode("ride_a", 0.4, 0.5);
+  let n2 = new MapNode("junc", 0.3, 0.5);
+  let n3 = new MapNode("ride_b", 0.4, 0.5);
+  let n4 = new MapNode("ride_a", 0.6, 0.5);
+  let n5 = new MapNode("junc", 0.7, 0.5);
+  let n6 = new MapNode("ride_b", 0.8, 0.5);
+  let n7 = new MapNode("ride_a", 0.3, 0.3);
+  let n8 = new MapNode("ride_b", 0.5, 0.4);
+  let n9 = new MapNode("ride_a", 0.7, 0.3);
+  let n10 = new MapNode("ride_b", 0.4, 0.2);
+  let n11 = new MapNode("junc", 0.5, 0.3);
+  let n12 = new MapNode("ride_a", 0.6, 0.3);
+
+
 
   // set the global vars
-  // rides = [n1, n3, n4, n6, n7, n8, n9, n10, n12];
+  rides = [n1, n3, n4, n6, n7, n8, n9, n10, n12];
   // entrance = e;
 
   // initialise the actual map
-  // nodes = [e, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12];
-  nodes = [e, n1, n2, n3, n4, n5, n6, n7];
-  // connections = [[1, 2], [2, 3], [3, 0], [0, 4], [4, 5], [5, 6], [2, 7], [3, 8], [8, 4], [5, 9], [8, 11], [7, 10], [9, 12], [10, 12], [12, 11], [11, 10]];
-  connections = [[0,1],[1,2],[1,7],[2,3],[2,4],[3,5],[4,5],[5,6]]
+  nodes = [e, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12];
+  connections = [[1, 2], [2, 3], [3, 0], [0, 4], [4, 5], [5, 6], [2, 7], [3, 8], [8, 4], [5, 9], [8, 11], [7, 10], [9, 12], [10, 12], [12, 11], [11, 10]];
   simMap = new SimMap(nodes, connections);
 }
-
-function getAvgScore() {
-  let totalScore = 0; // get totalScore to track the total score
-  for (let agent of agents) {
-      totalScore += agent.satisfaction // add each agent's satisfaction to totalScore
-  }
-
-  if (agents.length == 0){
-    return 0
-  } 
-  else{
-    return totalScore / agents.length; // average score = total score / total number of agents
-  }
-}
-  
 
 function updateLoop() {
   addAgents();
@@ -455,8 +371,15 @@ function updateLoop() {
     avgQueueTimeHist.push(averageQueueTime);
     minQueueTimeHist.push(simMap.getMinQueueTime());
 
-    avgScore = getAvgScore();
-    avgScoreHist.push(avgScore);
+
+    // calculate average queue time
+    // calculate min queue time
+    // if (timeSpentHist.length > MAX_AGT_SAMPLES) {
+    //   // remove the oldest data point
+    //   timeSpentHist.shift();
+    //   timeQueueHist.shift();
+    //   rideHist.shift();
+    // }
   }
 
 }
@@ -468,25 +391,18 @@ function addAgents() {
     totalVisitors++;
 
     const typeRNG = Math.random();
-    if (typeRNG < PRIORITY_PROB) {
+    if (typeRNG < TOLERANCE_PROB) {
       // console.log("priority entered");
-      const agent = new Agent(simMap, priority = true, grp = 1);
+      const agent = new Agent(simMap, tolerance = true, score = 100);
       agents.push(agent);
 
-    } 
-    // else if (typeRNG < GRP_PROB) {
-    //   // console.log("group entered");
-    //   const agent = new Agent(simMap, priority = false, grp = Math.ceil(Math.random() * 4) + 1);
-    //   agents.push(agent);
-    //   grp += 1
-    //   totalVisitors += agent.size - 1;
-    //   // need to instantiate a new agent, otherwise, it'll just be one agent being updated twice per loop
-    //   // possible to identify groupings within the agents? maybe some sort of id
-    //   // agents.push(agent);
-    // }
+    }
+      // need to instantiate a new agent, otherwise, it'll just be one agent being updated twice per loop
+      // possible to identify groupings within the agents? maybe some sort of id
+      // agents.push(agent);
     else {
       // console.log("entered");
-      const agent = new Agent(simMap, priority = false, grp = 1);
+      const agent = new Agent(simMap, tolerance = false, score = 100);
       agents.push(agent);
     }
   }

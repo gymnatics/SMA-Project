@@ -2,16 +2,17 @@ class SimMap {
   constructor(nodes, connections) {
     this.nodes = nodes;
     this.entrance = nodes.filter((node) => node.type == "entrance")[0];
-    this.rides = nodes.filter((node) => (node.type == "ride_a") || (node.type == "ride_b"));
+    console.log(this.entrance)
+    this.rides = nodes.filter((node) => (node.type == "ride_a" || node.type == "ride_b"));
     this.edges = [];
     for (let connect of connections) {
       this.connectNode(connect[0], connect[1]);
     }
 
-    // set the rideIDs
-    for (let i = 0; i < this.rides.length; i++) {
-      this.rides[i].setRideName(i + 1);
-    }
+    // // set the rideIDs
+    // for (let i = 0; i < this.rides.length; i++) {
+    //   this.rides[i].setRideName(node.type);
+    // }
 
     // run floyd warshall for setup()
     this.floydWarshall();
@@ -20,7 +21,7 @@ class SimMap {
   checkMap() {
     // regenerate entrance and ride lists
     const entrances = nodes.filter((node) => node.type == "entrance");
-    this.rides = nodes.filter((node) => (node.type == "ride_a") || (node.type == "ride_b"));
+    this.rides = nodes.filter((node) => (node.type == "ride_a" || node.type =="ride_b"));
 
     // check only 1 entrance
     if (entrances.length != 1) {
@@ -36,7 +37,7 @@ class SimMap {
 
     // set the rideIDs
     for (let i = 0; i < this.rides.length; i++) {
-      this.rides[i].setRideName(i + 1);
+      this.rides[i].setRideName(node.type);
     }
 
     // run floyd warshall for setup
@@ -157,7 +158,7 @@ class SimMap {
     }
   }
 
-  drawMap(creatorMode) {
+  drawMap() {
     // draw edges
     stroke(255);
     strokeWeight(1);
@@ -170,29 +171,10 @@ class SimMap {
     strokeWeight(1);
     for (const node of this.nodes) {
 
-      // if (creatorMode) {
-      //   fill(node.fill);
-      //   circle(node.x, node.y, NODE_RADIUS);
-      // } else {
-      //   if (!(typeof node.img === "undefined" || node.img === null)) {
-      //     image(node.img, node.x - ICON_WIDTH / 2, node.y - ICON_HEIGHT, ICON_WIDTH, ICON_HEIGHT);
-      //   }
-      // }
-      if (node.type == "ride_a"){
-        rectMode(CENTER);
-        fill(255, 0, 0);
-        rect(node.x,node.y,50)
+      if (!(typeof node.img === "undefined" || node.img === null)) {
+        image(node.img, node.x - ICON_WIDTH / 2, node.y - ICON_HEIGHT, ICON_WIDTH, ICON_HEIGHT);
       }
-      if (node.type == "ride_b"){
-        rectMode(CENTER);
-        fill(0,255,0);
-        rect(node.x,node.y,50)
-      }
-      if (node.type == "entrance"){
-        rectMode(CENTER);
-        fill(0,0,255);
-        rect(node.x,node.y,50)
-      }
+      
     }
   }
 
@@ -209,26 +191,21 @@ class SimMap {
         break;
       }
     }
-    let minQ = Infinity, maxQ = 0, minD = Infinity, maxD = 0;
+    let minQ = Infinity, maxQ = 0
     for (let i = 0; i < this.nodes.length; i++) {
-      // we only want to get ride info (get queue time and distance)
-      if (i != startNodeIndex && ((this.nodes[i].type == "ride_a") || (this.nodes[i].type == "ride_b"))) {
+      // we only want to get ride info (get queue time )
+      if (i != startNodeIndex && (this.nodes[i].type == "ride_a" || this.nodes[i].type == "ride_b" )) {
         const queue = this.nodes[i].getQueueTime();
-        const distance = this.dist[startNodeIndex][i];
         minQ = min(queue, minQ);
         maxQ = max(queue, maxQ);
-        minD = min(distance, minD);
-        maxD = max(distance, maxD);
-        retInfo.push([distance, queue, this.nodes[i]]);
+        retInfo.push([queue, this.nodes[i]]);
       }
     }
     // normalise this info (so that we can score the rides effectively)
     const rangeQ = max(maxQ - minQ, 0.1);
-    const rangeD = max(maxD - minD, 1);
     // console.log(rangeQ + " " + rangeD);
     for (let i = 0; i < retInfo.length; i++) {
-      retInfo[i][0] = 1 - (retInfo[i][0] - minD) / rangeD;
-      retInfo[i][1] = 1 - (retInfo[i][1] - minQ) / rangeQ;
+      retInfo[i][0] = 1 - (retInfo[i][1] - minQ) / rangeQ;
     }
     return retInfo;
   }
@@ -254,7 +231,7 @@ class SimMap {
 
 class MapNode {
   constructor(type, x, y) {
-    // three types (entrance, ride_a,ride_b, junction)
+    // 4 types (entrance, ride_a, ride_b, junction)
     this.type = type;
     this.typeIndex = NODE_TYPES.findIndex(t => t === this.type);
 
@@ -272,18 +249,18 @@ class MapNode {
     if (this.type == "entrance") {
       this.fill = "#a50";
       // this.img = loadImage(ENTRANCE_IMG_PATH);
-      this.img = null;
-    } else if ((this.type == "ride_a") || (this.type == "ride_b")) {
+    } else if (this.type == "ride_a" || this.type =="ride_b") {
       this.fill = "#0ab";
       // this.img = loadImage(RIDE_IMG_PATH);
-      this.img = null;
 
-      // if this is a ride, just choose random values for the ride parameters
-      // possible TODO: allow for editing of these parameterss
+      // if this is a ride, set the value for each ride.
+      // Should we set it as random??
+      // To adjust this, will need to edit the below functions respectively
+
       this.setRideParameters(getRideCapacity(this.type), getRideRuntime(this.type), getRideTurnover(this.type));
 
       // if this is a ride, also set the rideID (for display purposes)
-      // this.rideName = `Ride ${++rideID}`;
+      //this.rideName = `Ride ${}`;
 
       // for rides, let us store how many people are in queue at each second (basically every 30 frames)
       this.queueHist = [0];
@@ -291,12 +268,18 @@ class MapNode {
     }
   }
 
-  setRideName(rideID) {
-    this.rideName = `Ride ${rideID}`;
+
+  setRideName(ride_type) {
+    if (ride_type == "ride_a"){
+      this.rideName = "Ride A"
+    } else if (ride_type == "ride_b") {
+      this.rideName = "Ride B"
+    }
+    ;
   }
 
   getQueueTime() {
-    if ((this.type == "ride_a") || (this.type == "ride_b")) {
+    if (this.type == "ride_a" || this.type == "ride_b") {
       return int(ceil(this.queue.size() / this.capacity)) * this.turnover;
     } else return 0;
   }
@@ -319,8 +302,8 @@ class MapNode {
 
   getDisplayInfo() {
     // make sure that this node is actually a ride node
-    if ( (this.type == 'ride_a') || (this.type == "ride_b")) {
-      let displayInfo = `=== ${this.rideName} ===\nRide Name: ${this.type}\nCapacity: ${this.capacity}\nRuntime: ${this.runtime}\nTurnover: ${this.turnover}\nQueue time: ${this.getQueueTime()}`;
+    if (this.type == 'ride_a' || this.type == "ride_b") {
+      let displayInfo = `=== ${this.rideName},${this.type} ===\nCapacity: ${this.capacity}\nRuntime: ${this.runtime}\nTurnover: ${this.turnover}\nQueue time: ${this.getQueueTime()}`;
       return displayInfo;
     }
   }
@@ -352,13 +335,13 @@ class MapNode {
     this.turnoverCooldown = 0;
   }
 
-  enqueue(agent, priority) {
-    this.queue.push([priority, agent]);
+  enqueue(agent, tolerance) {
+    this.queue.push([tolerance, agent]);
     agent.startQueueing();
   }
 
   drawGraph() {
-    if ((this.type == "ride_a") || (this.type == "ride_b")) {
+    if (this.type == "ride") {
       // possible TODO: make this not rely on magic numbers
       const maxHist = max(1, max(this.queueHist));
       const minHist = 0;
@@ -427,7 +410,7 @@ class MapNode {
       this.runCooldowns.push(this.runtime);
     }
 
-    // if there are people riding, update my ridecooldowns
+    // if there are people riding, update my ridecooldowns -- refers to ride durations
     if (this.runCooldowns.length > 0) {
       let dones = 0;
       for (let i = 0; i < this.runCooldowns.length; i++) {

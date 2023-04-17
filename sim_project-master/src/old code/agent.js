@@ -12,51 +12,61 @@ const AgentStates = {
 Object.freeze(AgentStates);
 
 class Agent {
-  constructor(map, priority = false, size = 1) {
+  // map is the themepark
+  constructor(map, tolerance = false, score = 100) {
     this.map = map;
 
     this.agentState = AgentStates.ENTERING;
 
     this.x = map.entrance.x;
     this.y = map.entrance.y;
-    this.priority = priority;
-    this.size = size
-    this.satisfaction = 100;
+    this.tolerance = tolerance;
+    this.score = score;
+    // curNode refers to current node. Initialize as the starting of the map
     this.curNode = map.entrance;
 
     this.enteredTime = frameRunning;
-    this.timeSpentQueuing = 0;
+    this.timeQueueing = 0;
     this.numRidesTaken = 0;
 
     // need to also set some weights on whether to choose to go for near ones or far ones
     // given a ride with distance d and waiting time w, the score of the ride is
     // m1 * d + m2 * w where m1 and m2 are constants describing how important those variables are
+    // Could take the score as the amount of points that the agent will gain after riding the ride. Can add/minus bonus points afterwards
+
+    // For now, just take into consideration tolerance.
     // we also set another variable that suggests whether the park is too crowded for them to stay
-    if (this.priority == true) {
+    if (this.tolerance == true) {
+      // to differentiate between the type of agents
       this.fill = 'blue';
 
-      // priority visitors do not care about the waiting time
-      this.m1 = 0.9;
+      // visitors with tolerance to waiting times do not care about the waiting time
+      // this.m1 = 0.9;
       this.m2 = 0.1;
 
       // the park has to be really crowded for them to leave (since they have priority)
       this.limit = 10;
-    } else if (this.size != 1) {
-      this.fill = 'pink';
+    } 
+    
+  //   else if (this.size != 1) {
+  //     this.fill = 'pink';
 
-      // group visitors would probably them both equally
-      this.m1 = 0.5;
-      this.m2 = 0.5;
+  //     // group visitors would probably them both equally
+  //     this.m1 = 0.5;
+  //     this.m2 = 0.5;
 
-      // not really good with crowds
-      this.limit = 5;
+  //     // not really good with crowds
+  //     this.limit = 5;
 
-    } else {
+  //   } 
+  
+  else {
       this.fill = 'green';
 
       // solo visitors don't really care about the distance
-      this.m1 = 0.3;
-      this.m2 = 0.7;
+      // visitors without tolerance care more about waiting times
+      // this.m1 = 0.3;
+      this.m2 = 0.8;
 
       // okay with crowds
       this.limit = 7;
@@ -76,16 +86,17 @@ class Agent {
       this.agentState = AgentStates.EXITING;
       this.fill = "white";
 
-    } else if ((this.numRidesTaken >= int(ceil(RIDES_FOR_SATISFACTION * this.map.rides.length))) || ((this.satisfaction >= MAX_SATISFACTION) || (this.satisfaction <= 0))) {
-      // check to see if this agent will leave based on the number of rides taken
+    } else if (this.numRidesTaken >= int(ceil(RIDES_FOR_SATISFACTION * this.map.rides.length)) && this.score >= MAX_SCORE) {
+      // check to see if this agent will leave based on the score
       this.targetNode = this.map.entrance;
       this.agentState = AgentStates.EXITING;
       this.fill = "white";
 
-    } else if (this.agentState != AgentStates.ENTERED && Math.random() < DEPARTURE_PROB) {
+    } else if (this.agentState != AgentStates.ENTERED && this.score <= 0) {
       // randomly leaving
       this.targetNode = this.map.entrance;
       this.agentState = AgentStates.EXITING;
+      // White represents agents who are going to exit
       this.fill = "white";
     } else {
 
@@ -98,23 +109,26 @@ class Agent {
         this.fill = "white";
       } else {
 
-        // assign a score to each ride
+        // Update agent score for sitting ride
+        // assign a score to each ride 
+        
         let nextRideInfo = this.map.getRideInfoFromNode(this.curNode);
-        let scores = [];
-        let scoreTotal = 0;
+        let ride_scores = [];
+        let ridescoreTotal = 0;
         for (let info of nextRideInfo) {
-          const score = this.m1 * info[0] + this.m1 * info[1];
-          scoreTotal += score;
-          scores.push(score);
+          // const total_score = this.m1 * info[0] + this.m1 * info[1];
+          const total_score = this.m2 * info[0]
+          ridescoreTotal += total_score;
+          ride_scores.push(total_score);
         }
 
         // turn scores into probs and pick a weighted random ride
         let runningTotal = 0;
         let rng = Math.random();
         let choiceIndex = 0;
-        for (let i = 0; i < scores.length; i++) {
-          scores[i] /= scoreTotal;
-          runningTotal += scores[i];
+        for (let i = 0; i < ride_scores.length; i++) {
+          ride_scores[i] /= ridescoreTotal;
+          runningTotal += ride_scores[i];
           if (rng < runningTotal) {
             choiceIndex = i;
             break;
@@ -168,7 +182,6 @@ class Agent {
         if (this.lerpT >= 1) {
           this.x = this.targetX;
           this.y = this.targetY;
-          this.satifaction -= 1;
           if (this.curNode === this.targetNode) {
             if (this.agentState == AgentStates.MOVING) this.agentState = AgentStates.REACHED;
             else this.agentState = AgentStates.EXITED;
@@ -183,11 +196,13 @@ class Agent {
       case AgentStates.REACHED:
         // enqueue this agent into the ride (ride will deal with them)
         // the second argument is the priority value, higher priority will be first to get to ride
-        if (this.priority == true) {
+        if (this.tolerance == true) {
           this.targetNode.enqueue(this, 1);
+          this.score = this.score - 2;
           break;
         } else {
           this.targetNode.enqueue(this, 0);
+          this.score = this.score - 4;
           break;
         }
       case AgentStates.FINISHED:
@@ -206,13 +221,12 @@ class Agent {
   startRiding() {
     this.numRidesTaken++;
     const queueTime = (frameRunning - this.startQueueTime) / FRAME_RATE;
-    this.timeSpentQueuing += queueTime;
-    this.satisfaction -= 2;
+    this.timeQueuing += queueTime;
   }
 
   doneRiding() {
     this.agentState = AgentStates.FINISHED;
-    this.satisfaction += 10
+    this.score = this.score + 20
   }
 
   draw() {
@@ -223,12 +237,8 @@ class Agent {
       this.x = lerp(this.initialX, this.targetX, this.lerpT);
       this.y = lerp(this.initialY, this.targetY, this.lerpT);
     }
-    if (this.priority == true) {
+    if (this.tolerance == true) {
       ellipse(this.x, this.y, 1.5 * AGENT_RADIUS);
-    } else if (this.size != 1) {
-      for (var i = 0; i < this.size; i++) {
-        ellipse(this.x, this.y + i * AGENT_RADIUS, AGENT_RADIUS);
-      }
     } else {
       ellipse(this.x, this.y, AGENT_RADIUS);
     }

@@ -77,7 +77,8 @@ function getRandomColor() {
 function getRideCapacity(ride_type) {
   var capacityDict = {
     "ride_a": 10,
-    "ride_b": 6
+    "ride_b": 6,
+    "ride_c": 8
   }
   
   return ride_type in capacityDict ? capacityDict[ride_type] : 0
@@ -87,7 +88,8 @@ function getRideCapacity(ride_type) {
 function getRideRuntime(ride_type) {
   var runTimeDict = {
     "ride_a": 4,
-    "ride_b": 2
+    "ride_b": 2,
+    "ride_c": 3
   }
   
   return ride_type in runTimeDict ? runTimeDict[ride_type] : 0
@@ -103,19 +105,17 @@ function getRideRuntime(ride_type) {
 function getRideTurnover(ride_type) {
   var turnoverDict = {
     "ride_a": 4,
-    "ride_b": 2
+    "ride_b": 2,
+    "ride_c": 3,
   }
   
   return ride_type in turnoverDict ? turnoverDict[ride_type] : 0
   
 }
-// // returns a number uniformly from 1 to 5
-// function getRideTurnover() {
-//   return Math.floor(Math.random() * 5) + 1;
-// }
+
 
 // taken from stackoverflow: https://stackoverflow.com/questions/42919469/efficient-way-to-implement-priority-queue-in-javascript
-// because im too lazy to implement a priority queue in javascript
+
 const PQtop = 0;
 const PQparent = i => ((i + 1) >>> 1) - 1;
 const PQleft = i => (i << 1) + 1;

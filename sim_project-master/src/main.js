@@ -58,26 +58,26 @@ function setup() {
   const statsBtn = createButton("Show/Hide global statistics");
   const csvBtn = createButton("Export statistics (CSV)");
   const pBtn = createP();
-  const createBtn = createButton("Toggle creator/simulator mode");
-  const defaultMapBtn = createButton("Create default map");
-  const resetMapBtn = createButton("Clear map");
+  // const createBtn = createButton("Toggle creator/simulator mode");
+  // const defaultMapBtn = createButton("Create default map");
+  // const resetMapBtn = createButton("Clear map");
 
   startBtn.parent(divs);
   resetBtn.parent(divs);
   statsBtn.parent(divs);
   csvBtn.parent(divs);
   pBtn.parent(divs);
-  createBtn.parent(divs);
-  defaultMapBtn.parent(divs);
-  resetMapBtn.parent(divs);
+  // createBtn.parent(divs);
+  // defaultMapBtn.parent(divs);
+  // resetMapBtn.parent(divs);
 
   startBtn.mouseClicked(toggleSim);
   resetBtn.mouseClicked(resetSim);
   statsBtn.mouseClicked(toggleStats);
   csvBtn.mouseClicked(exportCSV);
-  createBtn.mouseClicked(toggleCreate);
-  defaultMapBtn.mouseClicked(defaultMap);
-  resetMapBtn.mouseClicked(resetMap);
+  // createBtn.mouseClicked(toggleCreate);
+  // defaultMapBtn.mouseClicked(defaultMap);
+  // resetMapBtn.mouseClicked(resetMap);
 }
 
 function draw() {

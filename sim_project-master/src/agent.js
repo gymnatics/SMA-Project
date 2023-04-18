@@ -22,11 +22,13 @@ class Agent {
     this.priority = priority;
     this.size = size
     this.satisfaction = 100;
+    this.profit = 0;
     this.curNode = map.entrance;
 
     this.enteredTime = frameRunning;
     this.timeSpentQueuing = 0;
     this.numRidesTaken = 0;
+
 
     // need to also set some weights on whether to choose to go for near ones or far ones
     // given a ride with distance d and waiting time w, the score of the ride is
@@ -215,11 +217,13 @@ class Agent {
     if (this.curNode.type == "ride_a"){
       // console.log("curNode:", this.curNode);
       this.satisfaction += 50
+      this.profit += 5 - 2
       // console.log("satisfaction a:", this.satisfaction);
     }
     if (this.curNode.type == "ride_b"){
       // console.log("curNode:", this.curNode);
       this.satisfaction += 30
+      this.profit += 4 - 2
       // console.log("satisfaction b:", this.satisfaction);
     }
     

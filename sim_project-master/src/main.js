@@ -31,10 +31,15 @@ let numExitedAgents = 0;
 let averageQueueTime = 0;
 let avgQueueA = 0;
 let avgQueueB = 0;
+let avgQueueC = 0;
 let avgQueueAHist = [];
 let avgQueueBHist = [];
+let avgQueueCHist = [];
 let avgQueueTimeHist = [];
 let minQueueTimeHist = [];
+
+let avgProfits = 0;
+let avgProfitsHist = [];
 
 let avgScore = 0;
 let avgScoreHist = [];
@@ -221,9 +226,14 @@ function resetSim() {
   avgQueueTimeHist = [];
   avgQueueA = 0;
   avgQueueB = 0;
+  avgQueueC = 0;
   avgQueueAHist = [];
   avgQueueBHist = [];
+  avgQueueCHist = [];
   minQueueTimeHist = [];
+
+  avgProfits = 0;
+  avgProfitsHist = [];
 
   avgScore = 0;
   avgScoreHist = [];
@@ -265,9 +275,9 @@ function exportCSV() {
   // timeHist, minQueueTimeHist, avgQueueTimeHist, agtsLeftHist, totalVisitorsHist, timeSpentHist, timeQueueHist
   let table = new p5.Table();
 
-  table.columns = ["time", "avg_queue_time_a","avg_queue_time_b", "avg_wait_time", "agts_left", "total_agts", "time_in_park", "time_in_queue", "average_score"];
+  table.columns = ["time", "avg_queue_time_a", "avg_queue_time_b", "avg_wait_time", "agts_left", "total_agts", "time_in_park", "time_in_queue", "average_score", "average_profits"];
 
-  let data = [timeHist, avgQueueAHist,avgQueueBHist, avgQueueTimeHist, agtsLeftHist, totalVisitorsHist, timeSpentHist, timeQueueHist, avgScoreHist];
+  let data = [timeHist, avgQueueAHist, avgQueueBHist, avgQueueTimeHist, agtsLeftHist, totalVisitorsHist, timeSpentHist, timeQueueHist, avgScoreHist, avgProfitsHist];
   console.log(data);
   for (let j = 0; j < data[0].length; j++) {
     let rowData = [];
@@ -283,7 +293,7 @@ function exportCSV() {
 
 function drawDisplay() {
   for (let node of nodes) {
-    if (dist(node.x, node.y, mouseX, mouseY) < HOVER_RADIUS && ((node.type == "ride_a") || (node.type == "ride_b"))) {
+    if (dist(node.x, node.y, mouseX, mouseY) < HOVER_RADIUS && ((node.type == "ride_a") || (node.type == "ride_b") || (node.type == "ride_c"))) {
       // draw a rectangle at the top left to display info
       rectMode(CORNER);
       fill(255, 255, 255, 60);
@@ -345,7 +355,7 @@ function drawStats() {
   const btmBorder = HEIGHT;
 
   // possible todo: remove the magic numbers
-  drawGraph("time in park", timeSpentHist, leftBorder + 25, btmBorder - 60, 30);
+  drawGraph("average profits", avgProfitsHist, leftBorder + 25, btmBorder - 60, 30);
   drawGraph("average satisfaction", avgScoreHist, leftBorder + 150, btmBorder - 60, 1);
   drawGraph("ride queue times", avgQueueTimeHist, leftBorder + 275, btmBorder - 60, 10);
 
@@ -400,7 +410,7 @@ function createMap() {
   let n5 = new MapNode("junc", 0.5, 0.2);
   let n6 = new MapNode("ride_b", 0.5, 0.2);
   let n7 = new MapNode("ride_a", 0.7, 0.45);
-  // let n8 = new MapNode("ride_b", 0.5, 0.4);
+  let n8 = new MapNode("ride_b", 0.2, 0.2);
   // let n9 = new MapNode("ride_a", 0.7, 0.3);
   // let n10 = new MapNode("ride_b", 0.4, 0.2);
   // let n11 = new MapNode("junc", 0.5, 0.3);
@@ -412,9 +422,9 @@ function createMap() {
 
   // initialise the actual map
   // nodes = [e, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12];
-  nodes = [e, n1, n2, n3, n4, n5, n6, n7];
+  nodes = [e, n1, n2, n3, n4, n5, n6, n7, n8];
   // connections = [[1, 2], [2, 3], [3, 0], [0, 4], [4, 5], [5, 6], [2, 7], [3, 8], [8, 4], [5, 9], [8, 11], [7, 10], [9, 12], [10, 12], [12, 11], [11, 10]];
-  connections = [[0,1],[1,2],[1,7],[2,3],[2,4],[3,5],[4,5],[5,6]]
+  connections = [[0,1],[1,2],[1,7],[2,3],[2,4],[3,5],[4,5],[5,6],[6,8]]
   simMap = new SimMap(nodes, connections);
 }
 
@@ -431,6 +441,30 @@ function getAvgScore() {
   else{
     return totalScore / agents.length; // average score = total score / total number of agents
   }
+}
+
+function getAverageProfits() {
+    let totalProfits = 0; // get totalProfits to track the total profits
+    for (let agent of agents) {
+        
+        totalProfits += agent.profit // add each agent's satisfaction to totalScore
+    }
+  
+    if (agents.length == 0){
+      return 0
+    } 
+    else{
+      return totalProfits / agents.length; // average score = total score / total number of agents
+    }
+}
+
+function getAverageQueueTime2(){
+    let totalQueueTime = 0;
+    let rides = simMap.rides;
+    for (let ride of rides){
+        totalQueueTime += ride.getQueueTime();
+    }
+    return totalQueueTime / agents.length;
 }
   
 
@@ -449,6 +483,7 @@ function updateLoop() {
   averageQueueTime = simMap.getAverageQueueTime();
   avgQueueA = simMap.getAverageQueueTime_A();
   avgQueueB = simMap.getAverageQueueTime_B();
+  // avgQueueC = simMap.getAverageQueueTime_C();
 
   // update the histories with the calculated data
   const exitedVisitors = max(1, numExitedAgents);
@@ -467,6 +502,10 @@ function updateLoop() {
     minQueueTimeHist.push(simMap.getMinQueueTime());
     avgQueueAHist.push(avgQueueA);
     avgQueueBHist.push(avgQueueB);
+    // avgQueueCHist.push(avgQueueC);
+
+    avgProfits = getAverageProfits();
+    avgProfitsHist.push(avgProfits);
 
     avgScore = getAvgScore();
     avgScoreHist.push(avgScore);

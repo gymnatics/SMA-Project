@@ -456,7 +456,16 @@ function getAverageProfits() {
     else{
       return totalProfits / agents.length; // average score = total score / total number of agents
     }
-  }
+}
+
+function getAverageQueueTime2(){
+    let totalQueueTime = 0;
+    let rides = simMap.rides;
+    for (let ride of rides){
+        totalQueueTime += ride.getQueueTime();
+    }
+    return totalQueueTime / agents.length;
+}
   
 
 function updateLoop() {

@@ -64,12 +64,12 @@ let frameRunning = 0;
 
 
 // change the stuff below as you see fit
-// stores a number from 6-12
+// stores a number from 6-15
 function getRideCapacity(ride_type) {
   var capacityDict = {
-    "ride_a": 10,
-    "ride_b": 6,
-    "ride_c": 8
+    "ride_a": 15,
+    "ride_b": 9,
+    "ride_c": 6
   }
   
   return ride_type in capacityDict ? capacityDict[ride_type] : 0
@@ -79,9 +79,9 @@ function getRideCapacity(ride_type) {
 // stores a number from 1-5
 function getRideRuntime(ride_type) {
   var runTimeDict = {
-    "ride_a": 4,
-    "ride_b": 2,
-    "ride_c": 3
+    "ride_a": 5,
+    "ride_b": 3,
+    "ride_c": 1
   }
   
   return ride_type in runTimeDict ? runTimeDict[ride_type] : 0
@@ -96,9 +96,9 @@ function getRideRuntime(ride_type) {
 // stores a number from 1-5
 function getRideTurnover(ride_type) {
   var turnoverDict = {
-    "ride_a": 4,
-    "ride_b": 2,
-    "ride_c": 3,
+    "ride_a": 5,
+    "ride_b": 3,
+    "ride_c": 1
   }
   
   return ride_type in turnoverDict ? turnoverDict[ride_type] : 0

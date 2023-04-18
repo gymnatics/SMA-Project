@@ -38,8 +38,23 @@ let avgQueueCHist = [];
 let avgQueueTimeHist = [];
 let minQueueTimeHist = [];
 
+let avgQueueTimePerson = 0;
+let avgQueueTimePersonA = 0;
+let avgQueueTimePersonB = 0;
+let avgQueueTimePersonC = 0;
+let avgQueueTimePersonHist = [];
+let avgQueueTimePersonHistA = [];
+let avgQueueTimePersonHistB = [];
+let avgQueueTimePersonHistC = [];
+
 let avgProfits = 0;
+let avgProfitsA = 0;
+let avgProfitsB = 0;
+let avgProfitsC = 0;
 let avgProfitsHist = [];
+let avgProfitsHistA = [];
+let avgProfitsHistB = [];
+let avgProfitsHistC = [];
 
 let avgScore = 0;
 let avgScoreHist = [];
@@ -223,17 +238,32 @@ function resetSim() {
   numExitedAgents = 0;
 
   averageQueueTime = 0;
-  avgQueueTimeHist = [];
   avgQueueA = 0;
   avgQueueB = 0;
   avgQueueC = 0;
   avgQueueAHist = [];
   avgQueueBHist = [];
   avgQueueCHist = [];
+  avgQueueTimeHist = [];
   minQueueTimeHist = [];
-
+  
+  avgQueueTimePerson = 0;
+  avgQueueTimePersonA = 0;
+  avgQueueTimePersonB = 0;
+  avgQueueTimePersonC = 0;
+  avgQueueTimePersonHist = [];
+  avgQueueTimePersonHistA = [];
+  avgQueueTimePersonHistB = [];
+  avgQueueTimePersonHistC = [];
+  
   avgProfits = 0;
+  avgProfitsA = 0;
+  avgProfitsB = 0;
+  avgProfitsC = 0;
   avgProfitsHist = [];
+  avgProfitsHistA = [];
+  avgProfitsHistB = [];
+  avgProfitsHistC = [];
 
   avgScore = 0;
   avgScoreHist = [];
@@ -275,9 +305,9 @@ function exportCSV() {
   // timeHist, minQueueTimeHist, avgQueueTimeHist, agtsLeftHist, totalVisitorsHist, timeSpentHist, timeQueueHist
   let table = new p5.Table();
 
-  table.columns = ["time", "avg_queue_time_a", "avg_queue_time_b", "avq_queue_time_c", "avg_wait_time", "agts_left", "total_agts", "time_in_park", "time_in_queue", "average_score", "average_profits"];
+  table.columns = ["time", "avg_queue_time_a", "avg_queue_time_b", "avg_queue_time_c", "avg_wait_time","avg_wait_person", "avg_wait_person_a","avg_wait_person_b","avg_wait_person_c", "total_agts", "time_in_park", "time_in_queue", "average_score", "average_profits","average_profits_a","average_profits_b","average_profits_c"];
 
-  let data = [timeHist, avgQueueAHist, avgQueueBHist, avgQueueCHist, avgQueueTimeHist, agtsLeftHist, totalVisitorsHist, timeSpentHist, timeQueueHist, avgScoreHist, avgProfitsHist];
+  let data = [timeHist, avgQueueAHist, avgQueueBHist, avgQueueCHist, avgQueueTimeHist,avgQueueTimePersonHist,avgQueueTimePersonHistA, avgQueueTimePersonHistB, avgQueueTimePersonHistC, totalVisitorsHist, timeSpentHist, timeQueueHist, avgScoreHist, avgProfitsHist,avgProfitsHistA, avgProfitsHistB, avgProfitsHistC];
   console.log(data);
   for (let j = 0; j < data[0].length; j++) {
     let rowData = [];
@@ -458,13 +488,105 @@ function getAverageProfits() {
     }
 }
 
-function getAverageQueueTime2(){
+
+function getAverageProfitsA() {
+    let totalProfitsA = 0; // get totalProfits to track the total profits
+    for (let agent of agents) {
+        if (agent.curNode.type == "ride_a"){
+            // add each agent's profit to total profit
+            totalProfitsA += agent.profit
+        }
+    }
+        
+  
+    if (agents.length == 0){
+      return 0
+    } 
+    else{
+      return totalProfitsA / agents.length; // average score = total score / total number of agents
+    }
+}
+
+function getAverageProfitsB() {
+    let totalProfitsB = 0; // get totalProfits to track the total profits
+    for (let agent of agents) {
+        if (agent.curNode.type == "ride_b"){
+            // add each agent's profit to total profit
+            totalProfitsB += agent.profit
+        }
+    }
+        
+  
+    if (agents.length == 0){
+      return 0
+    } 
+    else{
+      return totalProfitsB / agents.length; // average score = total score / total number of agents
+    }
+}
+
+function getAverageProfitsC() {
+    let totalProfitsC = 0; // get totalProfits to track the total profits
+    for (let agent of agents) {
+        if (agent.curNode.type == "ride_c"){
+            // add each agent's profit to total profit
+            totalProfitsC += agent.profit
+        }
+    }
+        
+  
+    if (agents.length == 0){
+      return 0
+    } 
+    else{
+      return totalProfitsC / agents.length; // average score = total score / total number of agents
+    }
+}
+
+
+function getAverageQueueTimePerson(){
     let totalQueueTime = 0;
     let rides = simMap.rides;
     for (let ride of rides){
         totalQueueTime += ride.getQueueTime();
     }
     return totalQueueTime / agents.length;
+}
+
+function getAverageQueueTimePersonA(){
+    let totalQueueTimeA = 0;
+    let rides = simMap.rides;
+    for (let ride of rides){
+        if (ride.type =="ride_a"){
+            totalQueueTimeA += ride.getQueueTime();
+        }
+    }
+
+    return totalQueueTimeA / agents.length;
+}
+
+function getAverageQueueTimePersonB(){
+    let totalQueueTimeB = 0;
+    let rides = simMap.rides;
+    for (let ride of rides){
+        if (ride.type =="ride_b"){
+            totalQueueTimeB += ride.getQueueTime();
+        }
+    }
+
+    return totalQueueTimeB / agents.length;
+}
+
+function getAverageQueueTimePersonC(){
+    let totalQueueTimeC = 0;
+    let rides = simMap.rides;
+    for (let ride of rides){
+        if (ride.type =="ride_c"){
+            totalQueueTimeC += ride.getQueueTime();
+        }
+    }
+
+    return totalQueueTimeC / agents.length;
 }
   
 
@@ -484,6 +606,10 @@ function updateLoop() {
   avgQueueA = simMap.getAverageQueueTime_A();
   avgQueueB = simMap.getAverageQueueTime_B();
   avgQueueC = simMap.getAverageQueueTime_C();
+  avgQueueTimePerson = getAverageQueueTimePerson();
+  avgQueueTimePersonA = getAverageQueueTimePersonA();
+  avgQueueTimePersonB = getAverageQueueTimePersonB();
+  avgQueueTimePersonC = getAverageQueueTimePersonC();
 
   // update the histories with the calculated data
   const exitedVisitors = max(1, numExitedAgents);
@@ -504,8 +630,19 @@ function updateLoop() {
     avgQueueBHist.push(avgQueueB);
     avgQueueCHist.push(avgQueueC);
 
+    avgQueueTimePersonHist.push(avgQueueTimePerson);
+    avgQueueTimePersonHistA.push(avgQueueTimePersonA);
+    avgQueueTimePersonHistB.push(avgQueueTimePersonB);
+    avgQueueTimePersonHistC.push(avgQueueTimePersonC);
+
     avgProfits = getAverageProfits();
+    avgProfitsA = getAverageProfitsA();
+    avgProfitsB = getAverageProfitsB();
+    avgProfitsC = getAverageProfitsC();
     avgProfitsHist.push(avgProfits);
+    avgProfitsHistA.push(avgProfitsA);
+    avgProfitsHistB.push(avgProfitsB);
+    avgProfitsHistC.push(avgProfitsC);
 
     avgScore = getAvgScore();
     avgScoreHist.push(avgScore);

@@ -61,12 +61,12 @@ bm <- function(vals,bs="sqroot",warn=FALSE)
     
     Ys <- sapply(1:a,function(k) return(mean(vals[((k-1)*b+1):(k*b)])))
 
-    muhat <- mean(Ys)
-    sigmahatsq <- b*sum((Ys-muhat)^2)/(a-1)
+    muhat <- mean(Ys) # steady-state mean
+    sigmahatsq <- b*sum((Ys-muhat)^2)/(a-1) # steady state variance
 
     bmse <- sqrt(sigmahatsq/N)
 
-    return(list(est=muhat,se=bmse))
+    return(list(est=muhat,se=bmse, var = sigmahatsq))
   }
 
 ## apply bm to each col of a matrix of MCMC samples
@@ -83,14 +83,15 @@ bmmat=function(mcmat,skip=NA)
   else # assume it is NA
     num=ncol(mcmat)
 
-  bmvals=matrix(NA,num,2,dimnames=list(paste("V",seq(1,num),sep=""),c("est","se"))) # first col=est, second col=MS s.error
+  bmvals=matrix(NA,num,3,dimnames=list(paste("V",seq(1,num),sep=""),c("est","se","var"))) # first col=est, second col=MS s.error, third col= variance
 
   bmres=apply(mcmat,2,bm)
   for (i in 1:num)
     {
-      bmvals[i,]=c(bmres[[i]]$est,bmres[[i]]$se)
+      bmvals[i,]=c(bmres[[i]]$est,bmres[[i]]$se, bmres[[i]]$var)
     }
   return(bmvals)
+ 
 }
 ```
 
@@ -100,4 +101,4 @@ bm(sim_data3$avg_wait_person, bs="sqroot")
 ```{r}
 bmmat(sim_data3)
 ```
-
+### Calculate confidence interval

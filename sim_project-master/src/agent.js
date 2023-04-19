@@ -168,7 +168,7 @@ class Agent {
           
           if (this.curNode === this.targetNode) {
             if (this.agentState == AgentStates.MOVING){
-              // this.satifaction -= 5;
+              this.satifaction -= 5;
               this.agentState = AgentStates.REACHED;
             } else{
               this.agentState = AgentStates.EXITED;
@@ -217,13 +217,21 @@ class Agent {
     if (this.curNode.type == "ride_a"){
       // console.log("curNode:", this.curNode);
       this.satisfaction += 50
-      this.profit += 5 - 2
+      if (this.priority == true){
+        this.profits += 10 - 2
+      } else{
+        this.profit += 8 - 2
+      }
       // console.log("satisfaction a:", this.satisfaction);
     }
     if (this.curNode.type == "ride_b"){
       // console.log("curNode:", this.curNode);
       this.satisfaction += 30
-      this.profit += 4 - 2
+      if (this.priority == true){
+        this.profits += 8 - 2
+      } else{
+        this.profit += 6 - 2
+      }
       // console.log("satisfaction b:", this.satisfaction);
     }
     

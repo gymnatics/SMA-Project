@@ -7,7 +7,6 @@ const AgentStates = {
     "REACHED": 104, // reached the target ride
     "FINISHED": 105, // done with the current ride
     "EXITED": 106, // exited the park (should remove from agents)
-    "LEFT": 107, // left the park without paying
   };
   Object.freeze(AgentStates);
   
@@ -42,16 +41,6 @@ const AgentStates = {
   
         // the park has to be really crowded for them to leave (since they have priority)
         this.limit = 10;
-      } else if (this.size != 1) {
-        this.fill = 'pink';
-  
-        // group visitors would probably them both equally
-        this.m1 = 0.5;
-        this.m2 = 0.5;
-  
-        // not really good with crowds
-        this.limit = 5;
-  
       } else {
         this.fill = 'green';
   
@@ -64,14 +53,11 @@ const AgentStates = {
       }
   
       // slightly randomise the movespeeds so that agents dont overlap
-      // can be removed if this behaviour is not wanted (just remove the randomisation)
-      // the magnitude of randomisation actually needs to be on the order of 10s in order to have a noticeable effect
-      // give it a range of +-20 from the original
       this.moveSpeed = MOVE_SPEED + (Math.random() * 40 - 20);
     }
   
     nextDestination() {
-      // check the crowds (this is done by checking the average wait times)
+      // check the average queue times
       if (this.agentState != AgentStates.ENTERED && this.map.getAverageQueueTime() > this.limit && Math.random() < CROWD_DEPARTURE_PROB) {
         this.targetNode = this.map.entrance;
         this.agentState = AgentStates.EXITING;
@@ -88,7 +74,7 @@ const AgentStates = {
         // pick another ride
         const rides = this.map.rides.filter((r) => !(r === this.curNode));
         if (rides.length == 0) {
-          // just exit (since this means that there's only 1 ride)
+          // just exit 
           this.targetNode = this.map.entrance;
           this.agentState = AgentStates.EXITING;
           this.fill = "white";
@@ -117,8 +103,7 @@ const AgentStates = {
             }
           }
           this.targetNode = nextRideInfo[choiceIndex][2];
-          // const choice = Math.floor(Math.random() * rides.length);
-          // this.targetNode = rides[choice];
+  
           this.agentState = AgentStates.MOVING;
         }
       }
@@ -149,10 +134,7 @@ const AgentStates = {
     update() {
       switch (this.agentState) {
         case AgentStates.ENTERING:
-          // look at all the rides and see if the crowds are too high
-          // if too high, set it to AgentStates.LEFT
-          if (this.map.getAverageQueueTime() > this.limit && Math.random() < CROWD_TURNAWAY_PROB) this.agentState = AgentStates.LEFT;
-          else this.agentState = AgentStates.ENTERED;
+          this.agentState = AgentStates.ENTERED;
           break;
         case AgentStates.ENTERED:
           // pick a random ride to head to
@@ -174,14 +156,14 @@ const AgentStates = {
                 }
             } else {
               // not yet reached the target node
-              // drop the front node (we're there already), and start moving again
+              
               this.path.shift();
               this.startMoving();
             }
           }
           break;
         case AgentStates.REACHED:
-          // enqueue this agent into the ride (ride will deal with them)
+          // enqueue this agent into the ride 
           // the second argument is the priority value, higher priority will be first to get to ride
           if (this.priority == true) {
             this.targetNode.enqueue(this, 1);
@@ -197,13 +179,12 @@ const AgentStates = {
     //   console.debug("satisfaction:", this.satisfaction);
     }
   
-    // putting this here just to keep track of when the agent starts queuing
+    
     startQueueing() {
       this.agentState = AgentStates.QUEUING;
       this.startQueueTime = frameRunning;
     }
   
-    // putting this here just to keep track of when the agent reaches the end of the queue
     startRiding() {
       this.numRidesTaken++;
       const queueTime = (frameRunning - this.startQueueTime) / FRAME_RATE;

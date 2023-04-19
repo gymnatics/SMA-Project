@@ -82,26 +82,19 @@ function setup() {
   const statsBtn = createButton("Show/Hide global statistics");
   const csvBtn = createButton("Export statistics (CSV)");
   const pBtn = createP();
-  // const createBtn = createButton("Toggle creator/simulator mode");
-  // const defaultMapBtn = createButton("Create default map");
-  // const resetMapBtn = createButton("Clear map");
 
   startBtn.parent(divs);
   resetBtn.parent(divs);
   statsBtn.parent(divs);
   csvBtn.parent(divs);
   pBtn.parent(divs);
-  // createBtn.parent(divs);
-  // defaultMapBtn.parent(divs);
-  // resetMapBtn.parent(divs);
+
 
   startBtn.mouseClicked(toggleSim);
   resetBtn.mouseClicked(resetSim);
   statsBtn.mouseClicked(toggleStats);
   csvBtn.mouseClicked(exportCSV);
-  // createBtn.mouseClicked(toggleCreate);
-  // defaultMapBtn.mouseClicked(defaultMap);
-  // resetMapBtn.mouseClicked(resetMap);
+
 }
 
 function draw() {
@@ -137,53 +130,7 @@ function draw() {
       drawStats();
     }
 
-  } else {
-    // creator mode loop
-    fill(255);
-    textAlign(RIGHT, TOP);
-    text("=== Instructions ===\n\
-          Click to place a new node\nDrag from one node to another to form a route\nClick node to toggle its type\nEvery ride must be reachable from the entrance\n\
-          ==== Colour Key ====\n\
-          orange: entrance (max 1)\ncyan: ride\nblack: junction", WIDTH - TEXT_PADDING_RIGHT, TEXT_PADDING_TOP)
-
-    let flag = false;
-    for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i];
-      if (dist(node.x, node.y, mouseX, mouseY) < SELECT_RADIUS) {
-        noStroke();
-        fill(200, 200, 200, 120);
-        circle(node.x, node.y, 2 * SELECT_RADIUS);
-        flag = true;
-        if (!selected && mouseIsPressed) {
-          selectedNodeIndex = i;
-          selected = true;
-        } else if (selected && !mouseIsPressed) {
-          // make sure this new connection isn't an existing one
-          let flag = true;
-          for (let connection of connections) {
-            if ((connection[0] == i && connection[1] == selectedNodeIndex) || (connection[0] == selectedNodeIndex && connection[1] == i)) flag = false;
-          }
-          if (flag) {
-            connections.push([selectedNodeIndex, i]);
-            simMap.connectNode(selectedNodeIndex, i);
-          }
-        }
-      }
-    }
-    selecting = flag;
-
-    if (selected) {
-      const node = nodes[selectedNodeIndex];
-      stroke("#f5220f");
-      line(node.x, node.y, mouseX, mouseY);
-      if (!mouseIsPressed) {
-        selected = false;
-        if (dist(node.x, node.y, mouseX, mouseY) < SELECT_RADIUS) {
-          node.toggleType();
-        }
-      }
-    }
-  }
+  } 
 }
 
 function mouseClicked() {
@@ -384,7 +331,7 @@ function drawStats() {
   const leftBorder = (WIDTH - STATS_WIDTH) / 2;
   const btmBorder = HEIGHT;
 
-  // possible todo: remove the magic numbers
+
   drawGraph("average profits", avgProfitsHist, leftBorder + 25, btmBorder - 60, 30);
   drawGraph("average satisfaction", avgScoreHist, leftBorder + 150, btmBorder - 60, 1);
   drawGraph("ride queue times", avgQueueTimeHist, leftBorder + 275, btmBorder - 60, 10);
@@ -441,19 +388,9 @@ function createMap() {
   let n6 = new MapNode("ride_b", 0.5, 0.2);
   let n7 = new MapNode("ride_b", 0.7, 0.45);
   let n8 = new MapNode("ride_a", 0.2, 0.2);
-  // let n9 = new MapNode("ride_a", 0.7, 0.3);
-  // let n10 = new MapNode("ride_b", 0.4, 0.2);
-  // let n11 = new MapNode("junc", 0.5, 0.3);
-  // let n12 = new MapNode("ride_a", 0.6, 0.2);
 
-  // set the global vars
-  // rides = [n1, n3, n4, n6, n7, n8, n9, n10, n12];
-  // entrance = e;
-
-  // initialise the actual map
-  // nodes = [e, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12];
   nodes = [e, n1, n2, n3, n4, n5, n6, n7, n8];
-  // connections = [[1, 2], [2, 3], [3, 0], [0, 4], [4, 5], [5, 6], [2, 7], [3, 8], [8, 4], [5, 9], [8, 11], [7, 10], [9, 12], [10, 12], [12, 11], [11, 10]];
+  
   connections = [[0,1],[1,2],[1,7],[2,3],[2,4],[3,5],[4,5],[5,6],[6,8]]
   simMap = new SimMap(nodes, connections);
 }
@@ -524,23 +461,6 @@ function getAverageProfitsB() {
     }
 }
 
-// function getAverageProfitsC() {
-//     let totalProfitsC = 0; // get totalProfits to track the total profits
-//     for (let agent of agents) {
-//         if (agent.curNode.type == "ride_c"){
-//             // add each agent's profit to total profit
-//             totalProfitsC += agent.profit
-//         }
-//     }
-        
-  
-//     if (agents.length == 0){
-//       return 0
-//     } 
-//     else{
-//       return totalProfitsC / agents.length; // average score = total score / total number of agents
-//     }
-// }
 
 
 function getAverageQueueTimePerson(){
@@ -576,17 +496,7 @@ function getAverageQueueTimePersonB(){
     return totalQueueTimeB / agents.length;
 }
 
-// function getAverageQueueTimePersonC(){
-//     let totalQueueTimeC = 0;
-//     let rides = simMap.rides;
-//     for (let ride of rides){
-//         if (ride.type =="ride_c"){
-//             totalQueueTimeC += ride.getQueueTime();
-//         }
-//     }
 
-//     return totalQueueTimeC / agents.length;
-// }
   
 
 function updateLoop() {
@@ -662,16 +572,6 @@ function addAgents() {
       agents.push(agent);
 
     } 
-    // else if (typeRNG < GRP_PROB) {
-    //   // console.log("group entered");
-    //   const agent = new Agent(simMap, priority = false, grp = Math.ceil(Math.random() * 4) + 1);
-    //   agents.push(agent);
-    //   grp += 1
-    //   totalVisitors += agent.size - 1;
-    //   // need to instantiate a new agent, otherwise, it'll just be one agent being updated twice per loop
-    //   // possible to identify groupings within the agents? maybe some sort of id
-    //   // agents.push(agent);
-    // }
     else {
       // console.log("entered");
       const agent = new Agent(simMap, priority = false, grp = 1);
@@ -690,9 +590,7 @@ function removeAgents() {
   let exitedAgents = agents.filter((agt) => agt.agentState == AgentStates.EXITED);
   agents = agents.filter((agt) => (agt.agentState != AgentStates.EXITED && agt.agentState != AgentStates.LEFT));
 
-  // let times = frameRunning * exitedAgents.length;
-  // let ridesTaken = 0;
-  // let queueTimes = 0;
+
   for (let agt of exitedAgents) {
     totalTimeSpent += (frameRunning - agt.enteredTime) / FRAME_RATE;
     totalTimeQueue += agt.timeSpentQueuing;

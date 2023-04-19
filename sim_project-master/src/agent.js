@@ -72,14 +72,14 @@ class Agent {
   }
 
   nextDestination() {
-    // check the crowds (this is done by checking the average wait times)
+    // check the average queue times
     if (this.agentState != AgentStates.ENTERED && this.map.getAverageQueueTime() > this.limit && Math.random() < CROWD_DEPARTURE_PROB) {
       this.targetNode = this.map.entrance;
       this.agentState = AgentStates.EXITING;
       this.fill = "white";
 
     } else if (((this.satisfaction >= MAX_SATISFACTION) || (this.satisfaction <= 0))) {
-      // check to see if this agent will leave based on the number of rides taken
+      
       this.targetNode = this.map.entrance;
       this.agentState = AgentStates.EXITING;
       this.fill = "white";
@@ -118,8 +118,7 @@ class Agent {
           }
         }
         this.targetNode = nextRideInfo[choiceIndex][2];
-        // const choice = Math.floor(Math.random() * rides.length);
-        // this.targetNode = rides[choice];
+
         this.agentState = AgentStates.MOVING;
       }
     }
@@ -150,10 +149,7 @@ class Agent {
   update() {
     switch (this.agentState) {
       case AgentStates.ENTERING:
-        // look at all the rides and see if the crowds are too high
-        // if too high, set it to AgentStates.LEFT
-        if (this.map.getAverageQueueTime() > this.limit && Math.random() < CROWD_TURNAWAY_PROB) this.agentState = AgentStates.LEFT;
-        else this.agentState = AgentStates.ENTERED;
+        this.agentState = AgentStates.ENTERED;
         break;
       case AgentStates.ENTERED:
         // pick a random ride to head to
@@ -175,14 +171,14 @@ class Agent {
               }
           } else {
             // not yet reached the target node
-            // drop the front node (we're there already), and start moving again
+            
             this.path.shift();
             this.startMoving();
           }
         }
         break;
       case AgentStates.REACHED:
-        // enqueue this agent into the ride (ride will deal with them)
+        // enqueue this agent into the ride 
         // the second argument is the priority value, higher priority will be first to get to ride
         if (this.priority == true) {
           this.targetNode.enqueue(this, 1);
@@ -198,13 +194,13 @@ class Agent {
     console.debug("satisfaction:", this.satisfaction);
   }
 
-  // putting this here just to keep track of when the agent starts queuing
+  
   startQueueing() {
     this.agentState = AgentStates.QUEUING;
     this.startQueueTime = frameRunning;
   }
 
-  // putting this here just to keep track of when the agent reaches the end of the queue
+  
   startRiding() {
     this.numRidesTaken++;
     const queueTime = (frameRunning - this.startQueueTime) / FRAME_RATE;

@@ -101,11 +101,9 @@ class SimMap {
     console.log("fw done");
   }
 
-  // unfortunately, not O(1) time, but O(n) due to path reconstruction on the fly
-  // but, this is faster than BFS and has distance-based traversal
-  // although, it doesn't seem to have any noticeable difference?
+ 
   getPathToNode(startNode, targetNode) {
-    // have to search for the indices, unfortunately
+
     let u, v;
     for (let i = 0; i < this.nodes.length; i++) {
       if (this.nodes[i] === startNode) u = i;
@@ -170,14 +168,7 @@ class SimMap {
     strokeWeight(1);
     for (const node of this.nodes) {
 
-      // if (creatorMode) {
-      //   fill(node.fill);
-      //   circle(node.x, node.y, NODE_RADIUS);
-      // } else {
-      //   if (!(typeof node.img === "undefined" || node.img === null)) {
-      //     image(node.img, node.x - ICON_WIDTH / 2, node.y - ICON_HEIGHT, ICON_WIDTH, ICON_HEIGHT);
-      //   }
-      // }
+
       if (node.type == "ride_a"){
         rectMode(CENTER);
         fill(255, 0, 0);
@@ -278,7 +269,7 @@ class SimMap {
 
 class MapNode {
   constructor(type, x, y) {
-    // three types (entrance, ride_a,ride_b, junction)
+
     this.type = type;
     this.typeIndex = NODE_TYPES.findIndex(t => t === this.type);
 
@@ -303,15 +294,14 @@ class MapNode {
       this.img = null;
 
       // if this is a ride, just choose random values for the ride parameters
-      // possible TODO: allow for editing of these parameterss
+
       this.setRideParameters(getRideCapacity(this.type), getRideRuntime(this.type), getRideTurnover(this.type));
 
-      // if this is a ride, also set the rideID (for display purposes)
-      // this.rideName = `Ride ${++rideID}`;
+
 
       // for rides, let us store how many people are in queue at each second (basically every 30 frames)
       this.queueHist = [0];
-      // this.maxQueueSoFar = 1;
+
     }
   }
 
@@ -332,9 +322,7 @@ class MapNode {
     this.runCooldowns = [];
     this.turnoverCooldown = 0;
     this.queueHist = [0];
-    // this.maxQueueSoFar = 1;
 
-    // should we rng the parameters again?
   }
 
   getType() {
@@ -387,16 +375,13 @@ class MapNode {
       const maxHist = max(1, max(this.queueHist));
       const minHist = 0;
 
-      // const RG_MIN_OFF = 7;
-      // const RG_MAX_OFF = 5;
 
       // draw the max and min values
       textAlign(CENTER, BOTTOM);
       fill(0);
       noStroke();
       text(maxHist, RG_X_START, RG_Y_START);
-      // textAlign(CENTER, BOTTOM);
-      // text(minHist, RG_X_START - RG_MIN_OFF, RG_Y_END + RG_MIN_OFF);
+
 
       // draw the x and y axes
       stroke(0);

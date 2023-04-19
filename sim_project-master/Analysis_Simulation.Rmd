@@ -1,0 +1,19 @@
+---
+title: "Analysis of Simulation"
+author: "Danny Yeo"
+date: "2023-04-19"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: united
+    fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+## Batch Means Approach

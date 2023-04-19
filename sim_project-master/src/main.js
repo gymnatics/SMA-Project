@@ -637,7 +637,7 @@ function updateLoop() {
     avgProfits = getAverageProfits();
     avgProfitsA = getAverageProfitsA();
     avgProfitsB = getAverageProfitsB();
-    avgProfitsC = getAverageProfitsC();
+    // avgProfitsC = getAverageProfitsC();
     avgProfitsHist.push(avgProfits);
     avgProfitsHistA.push(avgProfitsA);
     avgProfitsHistB.push(avgProfitsB);

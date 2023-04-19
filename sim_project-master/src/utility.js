@@ -5,7 +5,7 @@ const HEIGHT = 600;
 const AGENT_RADIUS = 7;
 const NODE_RADIUS = 10;
 
-const NODE_TYPES = ["junc", "ride_a","ride_b", "entrance"];
+const NODE_TYPES = ["junc", "ride_a","ride_b", "ride_c", "entrance"];
 
 // display information parameters
 const DISPLAY_HEIGHT = 175;
@@ -49,8 +49,6 @@ const MOVE_SPEED = 200; // moves x units per second
 const ICON_WIDTH = 40;
 const ICON_HEIGHT = 40;
 
-const RIDE_IMG_PATH = "res/roller-coaster.png";
-const ENTRANCE_IMG_PATH = "res/gate.jpg";
 
 // creator mode constants
 const SELECT_RADIUS = 13;
@@ -88,10 +86,7 @@ function getRideRuntime(ride_type) {
   
 }
 
-// // returns a number uniformly from 1 to 5
-// function getRideRuntime() {
-//   return Math.floor(Math.random() * 5) + 1;
-// }
+
 
 // stores a number from 1-5
 function getRideTurnover(ride_type) {

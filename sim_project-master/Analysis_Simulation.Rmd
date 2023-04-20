@@ -12,6 +12,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
 ```
 
 
@@ -29,7 +30,7 @@ Due to the time constraints, we chose to do do the Batch Means approach for data
 ### Read csv for 3 ride type data
 
 ```{r}
-sim_data3 <- read.csv("3_rides_data.csv")
+sim_data3 <- read.csv("data_3_rides.csv")
 
 
 head(sim_data3)
@@ -73,17 +74,8 @@ ggplot(new_df, aes(time)) +
   geom_line(aes(y = average_profits_b),color = "steelblue") +
   geom_line(aes(y = average_profits_c),color = "darkgreen")
 ```
-## Checking correlations
-```{r}
 
-# cov(new_df$avg_wait_time,new_df$avg_wait_person)*var(new_df$avg_wait_time)*var(new_df$avg_wait_person)
-corr <- function(x,y){
-  return(cov(x,y)*var(x)*var(y))
-}
-corr(new_df$avg_queue_time_a, new_df$avg_wait_time)
-```
-
-
+#Batch Means Method
 ```{r}
 bm <- function(vals,bs="sqroot",warn=FALSE)
   {
@@ -176,7 +168,7 @@ var_names <- names(conf_df)
 for (var_name in var_names){
   upper_bound <- conf_df[4, var_name]
   lower_bound <- conf_df[5,var_name]
-  cat(paste0("The confidence interval of ",var_name, " at 95% confidence is (", upper_bound, ",", lower_bound, ")\n"))
+  cat(paste0("The confidence interval of ",var_name, " at 95% confidence is (", lower_bound, ",", upper_bound, ")\n"))
 }
 ```
 

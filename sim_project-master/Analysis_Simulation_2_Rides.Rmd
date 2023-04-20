@@ -26,7 +26,11 @@ library(tidyverse)
 ```{r}
 sim_data2 <- read.csv("2_rides_data_v3.csv")
 sim_data2[is.na(sim_data2)] = 0
+sim_data2[is.na(sim_data2)] <- 0 # Replace NA values with 0
+sim_data3 <- read.csv("data_3_rides.csv")
+sim_data3[is.na(sim_data3)] <- 0 # Replace NA values with 0
 nrow(sim_data2)
+nrow(sim_data3)
 head(sim_data2)
 ```
 
@@ -35,36 +39,33 @@ head(sim_data2)
 ggplot(sim_data2, aes(time)) + 
   geom_line(aes(y = avg_wait_person),color = "orange") +
   geom_line(aes(y = avg_wait_person_a),color = "darkred") +
-  geom_line(aes(y = avg_wait_person_b),color = "steelblue")+
-  xlim(0,1500)
-  
-
+  geom_line(aes(y = avg_wait_person_b),color = "steelblue") +
+  xlim(0, 1000)
 ```
 
 ```{r}
 ggplot(sim_data2, aes(time)) + 
   geom_line(aes(y = time_in_park),color = "orange") +
-  geom_line(aes(y = time_in_queue),color = "darkred") + xlim(0,1500)
+  geom_line(aes(y = time_in_queue),color = "darkred")
 ```
 
 ```{r}
 ggplot(sim_data2, aes(time)) + 
-  geom_line(aes(y = average_score),color = "orange") + xlim(0,1500)
+  geom_line(aes(y = average_score),color = "orange")
 ```
 
 ```{r}
 ggplot(sim_data2, aes(time)) + 
   geom_line(aes(y = average_profits),color = "orange") +
   geom_line(aes(y = average_profits_a),color = "darkred") +
-  geom_line(aes(y = average_profits_b),color = "steelblue") +
-  xlim(0,10000)
+  geom_line(aes(y = average_profits_b),color = "steelblue")
 ```
-From the data, it seems that the burn-in period goes up till time = 3600. Hence, we will filter out values whose time < 3600. We use 3800 as our filter condition to be conservative.
+From the data, it seems that the burn-in period goes up till time = 3600 for the `sim_data2`, similar to `sim_data3`. Hence, we will filter out values whose time < 3600. We use 3800 as our filter condition to be conservative.
 
 ```{r}
-new_df <- filter(sim_data2, sim_data2$time > 3800)
+new_df2 <- filter(sim_data2, sim_data2$time > 3800)
 
-ggplot(new_df, aes(time)) + 
+ggplot(new_df2, aes(time)) + 
   geom_line(aes(y = average_profits),color = "orange") +
   geom_line(aes(y = average_profits_a),color = "darkred") +
   geom_line(aes(y = average_profits_b),color = "steelblue") 
@@ -77,7 +78,7 @@ ggplot(new_df, aes(time)) +
 corr <- function(x,y){
   return(cov(x,y)*var(x)*var(y))
 }
-corr(new_df$avg_queue_time_a, new_df$avg_wait_time)
+corr(new_df2$avg_queue_time_a, new_df2$avg_wait_time)
 ```
 
 
@@ -156,24 +157,24 @@ bm(sim_data2$avg_wait_person, bs="sqroot")
 ```
 
 ```{r}
-bmmat(new_df)
+bmmat(new_df2)
 ```
 ### Calculate confidence interval
 
 ```{r}
-conf_df <- as.data.frame(t(bmmat(new_df)))
+conf_df2 <- as.data.frame(t(bmmat(new_df2)))
 
 # filter out columns you are not using
-conf_df <- subset(conf_df, select = -c(time, total_agts))
-conf_df
+conf_df2 <- subset(conf_df2, select = -c(time, total_agts))
+conf_df2
 ```
 ```{r}
-var_names <- names(conf_df)
+var_names2 <- names(conf_df2)
 
-for (var_name in var_names){
-  upper_bound <- conf_df[4, var_name]
-  lower_bound <- conf_df[5,var_name]
-  cat(paste0("The confidence interval of ",var_name, " at 95% confidence is (", upper_bound, ",", lower_bound, ")\n"))
+for (var_name in var_names2){
+  upper_bound <- conf_df2[4, var_name]
+  lower_bound <- conf_df2[5,var_name]
+  cat(paste0("The confidence interval of ",var_name, " at 95% confidence is (", lower_bound, ",", upper_bound, ")\n"))
 }
 ```
 

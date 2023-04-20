@@ -15,37 +15,34 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```
 
+# Introduction
 
-## Introduction
-## Libraries
+# Libraries
 ```{r}
 library(ggplot2)
 library(zoo)
 library(tidyverse)
 ```
 
-## Batch Means Approach
+# Batch-Means Approach
+
 Due to the time constraints, we chose to do do the Batch Means approach for data collection. This is because each of our runs take about 1 hour, so in order to do 25 runs it would take over a day. We could have replicated the runs but we believed that if we were replicating the runs it would be better to just do the batch means approach.
 
-### Read csv for 3 ride type data
+## Read csv for 3 ride type data (`data_3_rides.csv`)
 
 ```{r}
 sim_data3 <- read.csv("data_3_rides.csv")
-
-
 head(sim_data3)
 ```
-## Determine burn-in period
-```{r}
 
+## Determine burn-in period
+
+```{r}
 ggplot(sim_data3, aes(time)) + 
   geom_line(aes(y = avg_wait_person),color = "orange") +
   geom_line(aes(y = avg_wait_person_a),color = "darkred") +
   geom_line(aes(y = avg_wait_person_b),color = "steelblue") +
   geom_line(aes(y = avg_wait_person_c),color = "darkgreen")
-  
-
-
 ```
 ```{r}
 ggplot(sim_data3, aes(time)) + 
@@ -63,6 +60,7 @@ ggplot(sim_data3, aes(time)) +
   geom_line(aes(y = average_profits_b),color = "steelblue") +
   geom_line(aes(y = average_profits_c),color = "darkgreen")
 ```
+
 From the data, it seems that the burn-in period goes up till time = 3600. Hence, we will filter out values whose time < 3600. We use 3800 as our filter condition to be conservative.
 
 ```{r}
@@ -75,11 +73,15 @@ ggplot(new_df, aes(time)) +
   geom_line(aes(y = average_profits_c),color = "darkgreen")
 ```
 
-#Batch Means Method
+## Applying The Batch-Means Method   
+
+We will construct interval estimates to obtain steady-state mean values using the batch-means method which is written as function `bm()`.
+
 ```{r}
 bm <- function(vals,bs="sqroot",warn=FALSE)
   {
     N <- length(vals)
+    paste0("There are ", N, "observations.")
     if (N<1000)
       {
         if (warn) # if warning
@@ -110,6 +112,8 @@ bm <- function(vals,bs="sqroot",warn=FALSE)
       }
     
     Ys <- sapply(1:a,function(k) return(mean(vals[((k-1)*b+1):(k*b)])))
+    
+    # return(Ys)
 
     muhat <- mean(Ys) # steady-state mean
     sigmahatsq <- sum((Ys-muhat)^2)/(a-1) # steady state variance
@@ -124,7 +128,7 @@ bm <- function(vals,bs="sqroot",warn=FALSE)
 ## input: mcmat is a matrix with each row corresponding to a sample from the multivariate distribution of interest
 ## skip = vector of columns to skip
 ## output: matrix with number of rows=number of dimensions of distribution and 2 columns (estimate and s.error)
-bmmat=function(mcmat,skip=NA)
+bmmat <- function(mcmat,skip=NA)
 {
   if (!any(is.na(skip)))
     {
@@ -147,7 +151,7 @@ bmmat=function(mcmat,skip=NA)
 ```
 
 ```{r}
-bm(sim_data3$avg_wait_person, bs="sqroot")
+bm(new_df$avg_wait_person, bs="sqroot")
 ```
 
 ```{r}

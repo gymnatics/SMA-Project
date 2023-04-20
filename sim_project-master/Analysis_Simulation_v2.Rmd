@@ -1,0 +1,288 @@
+---
+title: "Analysis of Simulation"
+author: "Danny Yeo"
+date: "2023-04-19"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: united
+    fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# Introduction
+
+# Libraries
+```{r}
+library(ggplot2)
+library(zoo)
+library(tidyverse)
+```
+
+# Batch-Means Approach
+
+Due to the time constraints, we chose to do do the Batch Means approach for data collection. This is because each of our runs take about 1 hour, so in order to do 25 runs it would take over a day. We could have replicated the runs but we believed that if we were replicating the runs it would be better to just do the batch means approach.
+
+## Read csv for 3 ride type data (`data_3_rides.csv`)
+
+```{r}
+sim_data3 <- read.csv("data_3_rides.csv")
+sim_data3[is.na(sim_data3)] <- 0 # Replace NA values with 0
+head(sim_data3)
+```
+
+## Determine burn-in period
+
+```{r}
+ggplot(sim_data3, aes(time)) + 
+  geom_line(aes(y = avg_wait_person),color = "orange") +
+  geom_line(aes(y = avg_wait_person_a),color = "darkred") +
+  geom_line(aes(y = avg_wait_person_b),color = "steelblue") +
+  geom_line(aes(y = avg_wait_person_c),color = "darkgreen")
+```
+```{r}
+ggplot(sim_data3, aes(time)) + 
+  geom_line(aes(y = time_in_park),color = "orange") +
+  geom_line(aes(y = time_in_queue),color = "darkred") 
+```
+```{r}
+ggplot(sim_data3, aes(time)) + 
+  geom_line(aes(y = average_score),color = "orange") 
+```
+```{r}
+ggplot(sim_data3, aes(time)) + 
+  geom_line(aes(y = average_profits),color = "orange") +
+  geom_line(aes(y = average_profits_a),color = "darkred") +
+  geom_line(aes(y = average_profits_b),color = "steelblue") +
+  geom_line(aes(y = average_profits_c),color = "darkgreen")
+```
+
+From the data, it seems that the burn-in period goes up till time = 3600. Hence, we will filter out values whose time < 3600. We use 3800 as our filter condition to be conservative.
+
+```{r}
+sim_data3_adjusted <- filter(sim_data3, sim_data3$time > 3800)
+
+ggplot(sim_data3_adjusted, aes(time)) + 
+  geom_line(aes(y = average_profits),color = "orange") +
+  geom_line(aes(y = average_profits_a),color = "darkred") +
+  geom_line(aes(y = average_profits_b),color = "steelblue") +
+  geom_line(aes(y = average_profits_c),color = "darkgreen")
+```
+
+We perform the same steps for the two-ride-type simulation data.
+
+## Read csv for two-ride-type data (`2_rides_data_v3.csv`)
+
+```{r}
+sim_data2 <- read.csv("2_rides_data_v3.csv")
+sim_data2[is.na(sim_data2)] <- 0 # Replace NA values with 0
+sim_data2 <- sim_data2[1:nrow(sim_data3), ] # Because sim_data2 has more rows than sim_data3, we remove sim_data2's excess rows
+head(sim_data2)
+```
+
+## Determine burn-in period
+
+```{r}
+ggplot(sim_data2, aes(time)) + 
+  geom_line(aes(y = avg_wait_person),color = "orange") +
+  geom_line(aes(y = avg_wait_person_a),color = "darkred") +
+  geom_line(aes(y = avg_wait_person_b),color = "steelblue")
+```
+```{r}
+ggplot(sim_data2, aes(time)) + 
+  geom_line(aes(y = time_in_park),color = "orange") +
+  geom_line(aes(y = time_in_queue),color = "darkred") 
+```
+```{r}
+ggplot(sim_data2, aes(time)) + 
+  geom_line(aes(y = average_score),color = "orange") 
+```
+```{r}
+ggplot(sim_data2, aes(time)) + 
+  geom_line(aes(y = average_profits),color = "orange") +
+  geom_line(aes(y = average_profits_a),color = "darkred") +
+  geom_line(aes(y = average_profits_b),color = "steelblue")
+```
+
+From the data, it seems that the burn-in period similarly goes up till time = 3600. Hence, we will filter out values whose time < 3600. We use 3800 as our filter condition to be conservative.
+
+```{r}
+sim_data2_adjusted <- filter(sim_data2, sim_data2$time > 3800)
+
+ggplot(sim_data2_adjusted, aes(time)) + 
+  geom_line(aes(y = average_profits),color = "orange") +
+  geom_line(aes(y = average_profits_a),color = "darkred") +
+  geom_line(aes(y = average_profits_b),color = "steelblue")
+```
+
+Because `sim_data3_adjusted` has 43663 rows while `sim_data2_adjusted` has 44307 rows, we remove the excess rows from `sim_data2_adjusted`.
+
+```{r}
+sim_data2_adjusted <- sim_data2_adjusted[1:nrow(sim_data3_adjusted), ]
+```
+
+## Applying The Batch-Means Method   
+
+Divide the data set with the removed initialisation bias into `sqrt(nrow(data_set))` batches.
+
+```{r}
+divide_into_batches <- function(data_set){
+  
+  num_obs <- nrow(data_set) # number of observations
+  # print(num_obs) # for debugging
+  batch_size <- floor(sqrt(num_obs)) # batch size
+  # print(batch_size) # for debugging
+  num_batches <- floor(num_obs / batch_size) # number of batches
+  # print(num_batches) # for debugging
+  
+  # Create a new df to store the batched data
+  data_set_colnames <- colnames(data_set)
+  batched_df <- data.frame(matrix(ncol = length(data_set_colnames), nrow = num_batches))
+  colnames(batched_df) <- data_set_colnames
+  
+  # for each variable we're observing,
+  for (column in 1:ncol(data_set)) {
+    # for each batch, calculate the batch/sample mean
+    for (batch in 1:num_batches) {
+      batch_start_row <- (batch - 1) * batch_size + 1
+      batch_end_row <- batch_start_row + batch_size - 1
+      batch_mean <- mean(data_set[batch_start_row:batch_end_row, column])
+      # for debugging
+      # if (is.na(batch_mean)) {
+      #   print(c(batch_start_row, batch_end_row, batch, column))
+      #   print(data_set[batch_start_row:batch_end_row, column])
+      # }
+      batched_df[batch, column] <- batch_mean # add the batch_mean to batched_df
+    }
+  }
+
+  batched_df
+}
+```
+
+Obtained the batch data for the three-ride-type simulation and the two-ride-type simulation.  
+
+```{r}
+three_ride_batched <- divide_into_batches(sim_data3_adjusted)
+two_ride_batched <- divide_into_batches(sim_data2_adjusted)
+```
+
+Obtain the difference, $Z_j = X_{1j} - X_{2j}$ between each batch between the two simulations for each variable being observed.  
+
+$$
+\text{Identify a confidence interval of } \zeta = \mu_1 - \mu_2 \\
+X_{ij} = \text{output } j \text{ from system } i \\
+\text{Let }Z_j = X_{1j} - X_{2j}, \text{ so } \mathbb{E}(Z_j) = \zeta
+$$
+
+```{r}
+three_ride_batched <- subset(three_ride_batched, select = c(colnames(two_ride_batched)))
+difference_df <- three_ride_batched - two_ride_batched
+```
+
+## Conduct a paired-t confidence interval for the difference between the performance of both theme park configurations for each variable observed.
+
+$$
+\text{Compute sample mean, } \bar{Z}_n = \frac{1}{n} \sum_{i = 1}^{n}{Z_i} \\
+\text{and sample variance, } \hat{\sigma}_n^2 = \frac{1}{n - 1} \sum_{i = 1}^{n}{(Z_i - \bar{Z}_n)^2} \\
+(1 - \alpha) * 100\% \text{ confidence interval for } \mu_1 - \mu_2 \text{ is } (\bar{Z}_n - t_{n-1, \alpha/2} \frac{\hat{\sigma_n}}{\sqrt n}, \bar{Z}_n + t_{n-1, \alpha/2} \frac{\hat{\sigma_n}}{\sqrt n})
+$$
+
+```{r}
+calculate_confidence_intervals <- function(difference, alpha){
+  
+  # Create a new df to store the batched data
+  data_set_colnames <- colnames(difference)
+  stats_df <- data.frame(matrix(ncol = length(data_set_colnames), nrow = 4))
+  colnames(stats_df) <- data_set_colnames
+  rownames(stats_df) <- c("sample_mean", "sample_variance", "lower_bound", "upper_bound")
+  
+  for (column in 1:ncol(difference)){
+    
+    # Calculate the degrees of freedom, sample mean, sample variance, and lower and upper bounds
+    col_values <- difference[, column]
+    # print(col_values)
+    deg_freedom <- length(col_values) - 1
+    sample_mean <- mean(col_values) # sample mean
+    sample_variance <- sum((col_values - sample_mean) ^ 2) / (length(col_values) - 1) # sample variance
+    upper_bound <- sample_mean + abs(qt(alpha / 2, deg_freedom - 1) * (sqrt(sample_variance) / sqrt(length(col_values))))
+    lower_bound <- sample_mean - abs(qt(alpha / 2, deg_freedom - 1) * (sqrt(sample_variance) / sqrt(length(col_values))))
+    
+    # print(sample_mean)
+    # print(sample_variance)
+    # print(lower_bound)
+    # print(upper_bound)
+    
+    # Store the values in stats_df
+    stats_df["sample_mean", column] <- sample_mean
+    stats_df["sample_variance", column] <- sample_variance
+    stats_df["lower_bound", column] <- lower_bound
+    stats_df["upper_bound", column] <- upper_bound
+  }
+  
+  stats_df
+  
+}
+```
+
+
+```{r}
+CI_stats <- calculate_confidence_intervals(difference_df, 0.05)
+CI_stats <- subset(CI_stats, select = -c(time, total_agts))
+CI_stats
+```
+
+## Display the confidence intervals
+
+Bearing in mind that $Z_j = X_{1j} - X_{2j}$ where $X_1$ refers to the observations for the three-ride-type system while $X_2$ refers to the observations for the two-ride system,
+
+```{r}
+col_names <- colnames(CI_stats)
+
+for (var_name in col_names){
+  upper_bound <- signif(CI_stats[3, var_name], 4)
+  lower_bound <- signif(CI_stats[4, var_name], 4)
+  # for the situations where the upper_bound is more negative than the lower bound
+  if (upper_bound < lower_bound) {
+    cat(paste0("The confidence interval of Z when it comes to ", var_name, " at 95% confidence is (", upper_bound, ",", lower_bound, ")\n"))
+  } 
+  else {
+    cat(paste0("The confidence interval of Z when it comes to ", var_name, " at 95% confidence is (", lower_bound, ",", upper_bound, ")\n"))
+  }
+}
+```
+
+## Analysing the confidence intervals
+
+| Categories           | Three Ride Types   | Two Ride Types  |
+| -------------        |:------------------:| ---------------:|
+| Average queue time for performance-type (`avg_queue_time_a`) | x      | ✓          |
+| Average queue time for slow-train-type (`avg_queue_time_b`) | ✓      | x          |
+| Average waiting time per attraction (`avg_wait_time`) | ✓      | x           |
+| Average waiting time per person (`avg_wait_person`) | ✓      | x           |
+| Average waiting time per priority-pass holder (`avg_wait_person_a`) | ✓      | x           |
+| Average waiting time per standard-pass holder (`avg_wait_person_b`) | ✓      | x           |
+| Average time in park per person (`time_in_park`) | ✓      | x           |
+| Average time in queue per person (`time_in_queue`) | ✓      | x           |
+| Average satisfaction per person (`average_score`) | ✓      | x           |
+| Average profits per attraction (`average_profits`) | x      | ✓           |
+| Average profits per for performance-type (`average_profits_a`) | x      | ✓           |
+| Average profits per for slow-train-type (`average_profits_b`) | x      | ✓           |
+| **Total** | **8**      | **4**           |    
+
+Based on the given results, we can see that the confidence intervals for all the variables are not centered around 0, which suggests that there are significant differences between the three-ride-type system and the two-ride system for all the variables.
+
+The confidence interval of $Z$ for `avg_queue_time_a` is (0.1678, 0.2644), which indicates that on average, customers taking performance-type rides in the three-ride-type system experience a 0.1678 to 0.2644 time units longer queue time compared to customers taking performance-type rides in the two-ride system. Similarly, the confidence interval of $Z$ for `avg_queue_time_b` is (-0.1873, -0.1127), which indicates that customers taking slow-train-type rides in the three-ride-type system experience a 0.1127 to 0.1873 time units shorter queue time compared to customers taking slow-train-type rides in a two-ride system.
+
+The confidence interval of $Z$ for `avg_wait_time` is (-1.597, -1.538), which indicates that the waiting time per ride in the three-ride-type system is on average 1.538 to 1.597 time units less than the waiting time in the two-ride system. Similarly, the confidence interval of $Z$ for `avg_wait_person` is (-0.02767, -0.02676), which indicates that each person in the three-ride-type system waits on average 0.02676 to 0.02767 time units less than each person in the two-ride system.
+
+The confidence intervals of $Z$ for `avg_wait_person_a`, `avg_wait_person_b`, `time_in_park`, and `time_in_queue` also suggest that there are significant differences between the two systems for these variables, with customers in the three-ride-type system experiencing less wait time and spending less time in the park and in queues than customers in the two-ride system.
+
+The confidence interval of $Z$ for `average_score` is (4.464, 4.992), which indicates that the average customer satisfaction score in the three-ride-type system is between 4.464 and 4.992 points higher than in the two-ride system. Finally, the confidence intervals of $Z$ for `average_profits`, `average_profits_a`, and `average_profits_b` suggest that the three-ride-type system is less profitable than the two-ride system for all pass types.
+
+Overall, these results suggest that the three-ride-type system performs better than the two-ride system in terms of customer wait times, customer satisfaction, and profitability.

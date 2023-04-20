@@ -25,6 +25,7 @@ library(tidyverse)
 
 ```{r}
 sim_data2 <- read.csv("2_rides_data_v3.csv")
+sim_data2[is.na(sim_data2)] = 0
 nrow(sim_data2)
 head(sim_data2)
 ```
@@ -34,36 +35,40 @@ head(sim_data2)
 ggplot(sim_data2, aes(time)) + 
   geom_line(aes(y = avg_wait_person),color = "orange") +
   geom_line(aes(y = avg_wait_person_a),color = "darkred") +
-  geom_line(aes(y = avg_wait_person_b),color = "steelblue") +
-  xlim(0, 1000)
+  geom_line(aes(y = avg_wait_person_b),color = "steelblue")+
+  xlim(0,1500)
+  
 
 ```
+
 ```{r}
-ggplot(sim_data3, aes(time)) + 
+ggplot(sim_data2, aes(time)) + 
   geom_line(aes(y = time_in_park),color = "orange") +
-  geom_line(aes(y = time_in_queue),color = "darkred") 
+  geom_line(aes(y = time_in_queue),color = "darkred") + xlim(0,1500)
 ```
+
 ```{r}
-ggplot(sim_data3, aes(time)) + 
-  geom_line(aes(y = average_score),color = "orange") 
+ggplot(sim_data2, aes(time)) + 
+  geom_line(aes(y = average_score),color = "orange") + xlim(0,1500)
 ```
+
 ```{r}
-ggplot(sim_data3, aes(time)) + 
+ggplot(sim_data2, aes(time)) + 
   geom_line(aes(y = average_profits),color = "orange") +
   geom_line(aes(y = average_profits_a),color = "darkred") +
   geom_line(aes(y = average_profits_b),color = "steelblue") +
-  geom_line(aes(y = average_profits_c),color = "darkgreen")
+  xlim(0,10000)
 ```
 From the data, it seems that the burn-in period goes up till time = 3600. Hence, we will filter out values whose time < 3600. We use 3800 as our filter condition to be conservative.
 
 ```{r}
-new_df <- filter(sim_data3, sim_data3$time > 3800)
+new_df <- filter(sim_data2, sim_data2$time > 3800)
 
 ggplot(new_df, aes(time)) + 
   geom_line(aes(y = average_profits),color = "orange") +
   geom_line(aes(y = average_profits_a),color = "darkred") +
-  geom_line(aes(y = average_profits_b),color = "steelblue") +
-  geom_line(aes(y = average_profits_c),color = "darkgreen")
+  geom_line(aes(y = average_profits_b),color = "steelblue") 
+  
 ```
 ## Checking correlations
 ```{r}
@@ -147,7 +152,7 @@ bmmat=function(mcmat,skip=NA)
 ```
 
 ```{r}
-bm(sim_data3$avg_wait_person, bs="sqroot")
+bm(sim_data2$avg_wait_person, bs="sqroot")
 ```
 
 ```{r}

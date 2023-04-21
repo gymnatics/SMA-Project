@@ -16,17 +16,29 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Introduction
+The goal of our simulation is to analyze whether having 3 ride types or 2 ride types in the theme park is better. In order to do so, we will perform a paired t-test of the 2 different ride configurations while keeping the location of the rides the same.
 
-# Libraries
+In this output analysis, our group will aim to analyze the following parameters of our simulation:
+1. The average satisfaction level of each customer(avgScore)
+2. The average queue time per ride (avg_wait_time)
+3. The average queue time for each type of ride (avg_queue_time_a,avg_queue_time_b,avg_queue_time_c)
+4. The average queue time per person (avg_wait_person)
+5. The average queue time per person for each type of ride (avg_wait_person_a, avg_wait_person_b, avg_wait_person_c)
+6. The average profits per person (average_profits)
+7. The average profits per person from each ride type (average_profits_a, average_profits_b, average_profits_c)
+
+Due to the time constraints, we chose to do do the Batch Means approach for data collection. This is because of 2 main reasons:
+1. Our simulation is computationally expensive as it takes along time to run.
+2. Our burn-in period is quite large, so the replication/deletion method would lead to alot of wasted data.
+
+## Libraries
 ```{r}
 library(ggplot2)
 library(zoo)
 library(tidyverse)
 ```
 
-# Batch-Means Approach
-
-Due to the time constraints, we chose to do do the Batch Means approach for data collection. This is because each of our runs take about 1 hour, so in order to do 25 runs it would take over a day. We could have replicated the runs but we believed that if we were replicating the runs it would be better to just do the batch means approach.
+#Output Analysis
 
 ## Read csv for 3 ride type data (`data_3_rides.csv`)
 

@@ -273,18 +273,18 @@ for (var_name in col_names){
 
 | Categories           | Three Ride Types   | Two Ride Types  |
 | -------------        |:------------------:| ---------------:|
-| Average queue time for performance-type (`avg_queue_time_a`) | x      | ✓          |
-| Average queue time for slow-train-type (`avg_queue_time_b`) | ✓      | x          |
+| Average queue time at each performance-type (`avg_queue_time_a`) | x      | ✓          |
+| Average queue time at each slow-train-type (`avg_queue_time_b`) | ✓      | x          |
 | Average waiting time per attraction (`avg_wait_time`) | ✓      | x           |
 | Average waiting time per person (`avg_wait_person`) | ✓      | x           |
-| Average waiting time per priority-pass holder (`avg_wait_person_a`) | ✓      | x           |
-| Average waiting time per standard-pass holder (`avg_wait_person_b`) | ✓      | x           |
+| Average waiting time per person for performance-type (`avg_wait_person_a`) | ✓      | x           |
+| Average waiting time per person for slow-train-type (`avg_wait_person_b`) | ✓      | x           |
 | Average time in park per person (`time_in_park`) | ✓      | x           |
 | Average time in queue per person (`time_in_queue`) | ✓      | x           |
 | Average satisfaction per person (`average_score`) | ✓      | x           |
-| Average profits per attraction (`average_profits`) | x      | ✓           |
-| Average profits per for performance-type (`average_profits_a`) | x      | ✓           |
-| Average profits per for slow-train-type (`average_profits_b`) | x      | ✓           |
+| Average profits per person (`average_profits`) | x      | ✓           |
+| Average profits per person for performance-type (`average_profits_a`) | x      | ✓           |
+| Average profits per person for slow-train-type (`average_profits_b`) | x      | ✓           |
 | **Total** | **8**      | **4**           |    
 
 Based on the given results, we can see that the confidence intervals for all the variables are not centered around 0, which suggests that there are significant differences between the three-ride-type system and the two-ride system for all the variables.

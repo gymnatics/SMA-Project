@@ -33,15 +33,13 @@ const GG_WIDTH = 100;
 // simulation parameters
 const ARRIVAL_PROB = 0.2;
 
-const CROWD_TURNAWAY_PROB = 0.9; // have x chance of leaving if the crowds are high
+
 const CROWD_DEPARTURE_PROB = 0.4; // leaving if the crowds are high (after actually entering)
 const RIDES_FOR_SATISFACTION = 0.8; // ride at least x * the number of rides available
-const SATISFIED_DEPARTURE_PROB = 0.9; // leaving once the agent is satisfied
-const DEPARTURE_PROB = 0.05; // low chance to leave for whatever other reason
 const MAX_SATISFACTION = 150;
 
 const PRIORITY_PROB = 0.1; // x of all visitors are priority
-const GRP_PROB = 0.6 + PRIORITY_PROB; // x of all visitors are groups
+
 
 const MOVE_SPEED = 200; // moves x units per second
 

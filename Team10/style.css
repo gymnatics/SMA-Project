@@ -35,3 +35,8 @@ table {
 body {
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
+
+.content {
+    max-width: 1000px;
+    margin: auto;
+}

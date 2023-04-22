@@ -1,28 +1,57 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
-<style>
-table {border-collapse: collapse;}
-th {border: 1px solid black;padding:5px;text-align:center;}
-td {border: 1px solid black;padding:5px;text-align:left;}
-</style>  
 <head>
-<!-- Add a suitable title for this page -->
-<title>User Interface</title>
+	<!-- Add a suitable title for this page -->
+	<title>Data Collection & Manipulation</title>
+	<link rel="stylesheet" href="../style.css">
 </head>
 <body>
+	<div class="content">
+		<h1>User Interface</h1>
+		<button onclick="window.location.href = '../index.html';">Home</button>
+		<br>
+		<br>
+		<table>
+		<!-- Add header row -->
+		<tr>
+			<th>Link</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td>
+				<a href="Team 10 Theme Park Data.xlsx">Data Collection (Excel)</a>
+				</td>
+				<td>
+				Here is our collection of ride data from Uncle Ringo and Disney World, Prof. Nuno :)!
+				</td>
+		</tr>
+		<!-- Add rows with <tr> tag. Be sure to close with </tr> tag -->
+
+		</table>
+
+		<p>To help us define our ride parameters like ride duration and capacity, we collected ride data on 72 attractions in Disney World and split our simulation’s attractions into three categories: </p>
+		<ol type="1">
+			<li>Slow trains,</li>
+			<li>Performances, and</li>
+			<li>Spinning-type rides.</li>
+		</ol>
+
+		<p>For the three types of rides, we found the mean of each type’s ride duration and capacity before reducing the means to ratios of each other which we will use in the simulation. The performance-type attractions have the longest mean ride duration followed by the slow trains and then the spinning-type attractions. Similarly, the performance-type attractions have the biggest mean capacities, followed by the slow trains and then the spinning-type rides.</p>
+
+		<p>See "Data Collection (Excel)" for the full set of data.</p>
+		<h2>Conclusion of data collection</h2>
+		<iframe src="Team 10 Theme Park Data Conclusion.htm" title="Data Collection Conclusion" width="1000" height="150"></iframe>	
+
+		<h2>Sources</h2>
+		<a href="http://www.uncleringo.com/product-category/catalogue/">Uncle Ringo Catalogue</a>
+		<br>
+		<a href="https://www.wdwinfo.com/wdwinfo/ridelength.htm">Disney World Ride Lengths</a> 
+		<br>
+		<br>
+		<button onclick="window.location.href = '../index.html';">Home</button>
+	</div>
 <!-- What is the name of this folder? -->
-<h2>User Interface</h2>
 
-<table>
-<!-- Add header row -->
-<tr>
-	<th>Link</th>
-	<th>Description</th>
-</tr>
-<!-- Add rows with <tr> tag. Be sure to close with </tr> tag -->
 
-	
-
-</table>
 </body>
 </html>

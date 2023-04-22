@@ -224,8 +224,8 @@ calculate_confidence_intervals <- function(difference, alpha){
     deg_freedom <- length(col_values) - 1
     sample_mean <- mean(col_values) # sample mean
     sample_variance <- sum((col_values - sample_mean) ^ 2) / (length(col_values) - 1) # sample variance
-    upper_bound <- sample_mean + abs(qt(alpha / 2, deg_freedom - 1) * (sqrt(sample_variance) / sqrt(length(col_values))))
-    lower_bound <- sample_mean - abs(qt(alpha / 2, deg_freedom - 1) * (sqrt(sample_variance) / sqrt(length(col_values))))
+    upper_bound <- sample_mean + abs(qt(alpha / 2, deg_freedom) * (sqrt(sample_variance) / sqrt(length(col_values))))
+    lower_bound <- sample_mean - abs(qt(alpha / 2, deg_freedom) * (sqrt(sample_variance) / sqrt(length(col_values))))
     
     # print(sample_mean)
     # print(sample_variance)

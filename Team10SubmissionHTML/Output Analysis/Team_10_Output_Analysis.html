@@ -1780,8 +1780,8 @@ n}, \bar{Z}_n + t_{n-1, \alpha/2} \frac{\hat{\sigma_n}}{\sqrt n})
     deg_freedom &lt;- length(col_values) - 1
     sample_mean &lt;- mean(col_values) # sample mean
     sample_variance &lt;- sum((col_values - sample_mean) ^ 2) / (length(col_values) - 1) # sample variance
-    upper_bound &lt;- sample_mean + abs(qt(alpha / 2, deg_freedom - 1) * (sqrt(sample_variance) / sqrt(length(col_values))))
-    lower_bound &lt;- sample_mean - abs(qt(alpha / 2, deg_freedom - 1) * (sqrt(sample_variance) / sqrt(length(col_values))))
+    upper_bound &lt;- sample_mean + abs(qt(alpha / 2, deg_freedom) * (sqrt(sample_variance) / sqrt(length(col_values))))
+    lower_bound &lt;- sample_mean - abs(qt(alpha / 2, deg_freedom) * (sqrt(sample_variance) / sqrt(length(col_values))))
     
     # print(sample_mean)
     # print(sample_variance)
@@ -1804,23 +1804,23 @@ CI_stats</code></pre>
 <pre><code>##                 avg_queue_time_a avg_queue_time_b avg_wait_time avg_wait_person
 ## sample_mean            0.2160970       -0.1500161   -1.56727319   -2.721595e-02
 ## sample_variance        0.1255717        0.0747341    0.04724716    1.093763e-05
-## lower_bound            0.1677725       -0.1872965   -1.59691531   -2.766695e-02
-## upper_bound            0.2644215       -0.1127357   -1.53763106   -2.676494e-02
+## lower_bound            0.1677738       -0.1872955   -1.59691448   -2.766694e-02
+## upper_bound            0.2644201       -0.1127367   -1.53763190   -2.676495e-02
 ##                 avg_wait_person_a avg_wait_person_b time_in_park time_in_queue
 ## sample_mean         -2.250850e-02     -2.055492e-02  -4.22806189   -2.89512718
 ## sample_variance      1.154534e-05      6.269584e-06   0.06108698    0.01263426
-## lower_bound         -2.297187e-02     -2.089638e-02  -4.26176701   -2.91045556
-## upper_bound         -2.204513e-02     -2.021346e-02  -4.19435678   -2.87979879
+## lower_bound         -2.297185e-02     -2.089637e-02  -4.26176606   -2.91045513
+## upper_bound         -2.204515e-02     -2.021347e-02  -4.19435773   -2.87979922
 ##                 average_score average_profits average_profits_a
 ## sample_mean          4.728024      -1.7535086        -1.2322787
 ## sample_variance      3.755518       0.5349222         0.1788641
-## lower_bound          4.463748      -1.8532480        -1.2899531
-## upper_bound          4.992299      -1.6537692        -1.1746043
+## lower_bound          4.463756      -1.8532452        -1.2899515
+## upper_bound          4.992291      -1.6537720        -1.1746060
 ##                 average_profits_b
 ## sample_mean            -0.9605887
 ## sample_variance         0.1301323
-## lower_bound            -1.0097830
-## upper_bound            -0.9113945</code></pre>
+## lower_bound            -1.0097816
+## upper_bound            -0.9113959</code></pre>
 </div>
 <div id="display-the-confidence-intervals" class="section level2">
 <h2>Display the confidence intervals</h2>

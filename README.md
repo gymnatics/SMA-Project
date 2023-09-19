@@ -1,6 +1,6 @@
 # SMA-Project
 
-Hello! This is Team 10: Sharlene World   
+Hello! This is Team 10: SMA Horrors
 
 Team Members:   
 Danny Yeo Rui Quan 1005138   
